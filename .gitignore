@@ -1,0 +1,7 @@
+# user
+*.user
+.vs/*
+
+# binaries
+bin/*
+obj/*

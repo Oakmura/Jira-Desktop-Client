@@ -1,0 +1,30 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Color x:Key="GrayColor1">#ff1f1f1f</Color>
+    <Color x:Key="GrayColor2">#ff262626</Color>
+    <Color x:Key="GrayColor3">#ff313131</Color>
+    <Color x:Key="GrayColor4">#ff404040</Color>
+    <Color x:Key="GrayColor5">#ff535353</Color>
+    <Color x:Key="GrayColor6">#ff6a6a6a</Color>
+    <Color x:Key="DisabledFontColor">#ff868686</Color>
+    <Color x:Key="FontColor">#ffdddddd</Color>
+    <Color x:Key="RedColor">#ffff5a6a</Color>
+    <Color x:Key="GreenColor">#ff90ee90</Color>
+    <Color x:Key="BlueColor">#ff80deff</Color>
+    <Color x:Key="OrangeColor">#ffffd067</Color>
+    <Color x:Key="SelectedBackgroundColor">#ff3c67b6</Color>
+
+    <SolidColorBrush x:Key="GrayBrush1" Color="{StaticResource GrayColor1}" />
+    <SolidColorBrush x:Key="GrayBrush2" Color="{StaticResource GrayColor2}" />
+    <SolidColorBrush x:Key="GrayBrush3" Color="{StaticResource GrayColor3}" />
+    <SolidColorBrush x:Key="GrayBrush4" Color="{StaticResource GrayColor4}" />
+    <SolidColorBrush x:Key="GrayBrush5" Color="{StaticResource GrayColor5}" />
+    <SolidColorBrush x:Key="GrayBrush6" Color="{StaticResource GrayColor6}" />
+    <SolidColorBrush x:Key="DisabledFontBrush" Color="{StaticResource DisabledFontColor}" />
+    <SolidColorBrush x:Key="FontBrush" Color="{StaticResource FontColor}" />
+    <SolidColorBrush x:Key="RedBrush" Color="{StaticResource RedColor}" />
+    <SolidColorBrush x:Key="GreenBrush" Color="{StaticResource GreenColor}" />
+    <SolidColorBrush x:Key="BlueBrush" Color="{StaticResource BlueColor}" />
+    <SolidColorBrush x:Key="OrangeBrush" Color="{StaticResource OrangeColor}" />
+    <SolidColorBrush x:Key="SelectedBackgroundBrush" Color="{StaticResource SelectedBackgroundColor}" />
+</ResourceDictionary>
