@@ -5,8 +5,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:JiraClient"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:tb="http://www.hardcodet.net/taskbar"
     xmlns:views="clr-namespace:JiraClient.Views"
-    Title="Jira Client"
+    Title="Jira Desktop Client"
     Width="1920"
     Height="1080"
     AllowDrop="True"
@@ -37,6 +38,9 @@
                         <ColumnDefinition />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0">
+                        <tb:TaskbarIcon IconSource="Resources/jira-icon.ico" ToolTipText="hello world" />
+                    </Grid>
                     <views:LoggerView Grid.Column="1" Margin="0,5,0,0" />
                 </Grid>
                 <GridSplitter

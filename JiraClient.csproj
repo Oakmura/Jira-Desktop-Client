@@ -16,4 +16,16 @@
     <NoWarn>1701;1702;NU1701</NoWarn>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="Resources\jira-icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="2.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\jira-icon.ico" />
+  </ItemGroup>
+
 </Project>
