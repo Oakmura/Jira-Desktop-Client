@@ -12,6 +12,7 @@
     Height="1080"
     AllowDrop="True"
     Style="{StaticResource WindowStyle}"
+    Closing="OnWindowClosingEvent"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
 
@@ -38,9 +39,6 @@
                         <ColumnDefinition />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <Grid Grid.Column="0">
-                        <tb:TaskbarIcon IconSource="Resources/jira-icon.ico" ToolTipText="hello world" />
-                    </Grid>
                     <views:LoggerView Grid.Column="1" Margin="0,5,0,0" />
                 </Grid>
                 <GridSplitter
