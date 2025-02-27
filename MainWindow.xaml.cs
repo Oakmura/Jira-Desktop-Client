@@ -14,43 +14,11 @@ using System.Net.Http.Headers;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using JiraClient.ViewModels;
+using JiraClient.Views;
 
 namespace JiraClient
 {
-    public class JiraIssueResponse
-    {
-        [JsonProperty("issues")]
-        public List<JiraIssue> Issues { get; set; }
-    }
-
-    public class JiraIssue
-    {
-        [JsonProperty("key")]
-        public string Key { get; set; }
-
-        [JsonProperty("fields")]
-        public JiraIssueFields Fields { get; set; }
-    }
-
-    public class JiraIssueFields
-    {
-        [JsonProperty("issuetype")]
-        public IssueType IssueType { get; set; }
-
-        [JsonProperty("summary")]
-        public string Summary { get; set; }
-
-        [JsonProperty("description")]
-        public string Description { get; set; }
-    }
-
-    public class IssueType
-    {
-        [JsonProperty("name")]
-        public string Name { get; set; }
-    }
-
-
     public partial class MainWindow : Window
     {
         private TaskbarIcon mNotifyIcon;
@@ -65,7 +33,7 @@ namespace JiraClient
 
         // Replace with your credentials
         private static string JIRA_BASE_URL;
-        private static string USER;
+        private static string USER_NAME;
         private static string API_TOKEN;
 
         public MainWindow()
@@ -89,21 +57,20 @@ namespace JiraClient
                 string authInfo = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{USER_NAME}:{API_TOKEN}"));
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authInfo);
 
-                string apiUrl = $"/rest/api/latest/search?fields=issuetype,summary,description&maxResults=5000";
+                // string apiUrl = $"/rest/api/latest/search?fields=issuetype,summary,description&maxResults=5000";
+                string apiUrl = $"/rest/api/latest/search?maxResults=5000";
+
+                Stopwatch sw = Stopwatch.StartNew();
                 HttpResponseMessage response = await client.GetAsync(apiUrl);
                 Debug.Assert(response.IsSuccessStatusCode);
+                sw.Stop();
+                _ = Logger.Log(MessageType.Info, $"Issue Fetch Took: {sw.Elapsed} seconds");
 
                 string result = await response.Content.ReadAsStringAsync();
                 JObject jsonResult = JObject.Parse(result);
 
-                var jiraResponse = JsonConvert.DeserializeObject<JiraIssueResponse>(result);
-                foreach (var issue in jiraResponse.Issues)
-                {
-                    _ = Logger.Log(MessageType.Error, $"Issue Key: {issue.Key}, Issue type: {issue.Fields.IssueType.Name}");
-                    _ = Logger.Log(MessageType.Info, $"Summary: {issue.Fields.Summary}");
-                    _ = Logger.Log(MessageType.Warning, $"Description: {issue.Fields.Description}");
-                }
-
+                JiraIssueResponse jiraResponse = JsonConvert.DeserializeObject<JiraIssueResponse>(result);
+                issueListView.DataContext = jiraResponse;
             }
         }
 
