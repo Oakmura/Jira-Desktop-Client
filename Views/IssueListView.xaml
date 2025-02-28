@@ -43,10 +43,16 @@
                             </DockPanel.Style>
 
                             <!--  Time Placeholder (JIRA doesn't have exact 'Time', so using Created Time)  -->
-                            <TextBlock
+                            <!--<TextBlock
                                 Margin="5,0"
                                 Text="{Binding Fields.FormattedCreated, StringFormat=yyyy-MM-dd HH:mm}"
-                                TextWrapping="Wrap">
+                                TextWrapping="Wrap" />-->
+
+                            <!--  Issue Key  -->
+                            <TextBlock
+                                Margin="0,0,5,0"
+                                FontWeight="Bold"
+                                Text="{Binding Key}">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Foreground" Value="LightGreen" />
@@ -62,18 +68,8 @@
                                 </TextBlock.Style>
                             </TextBlock>
 
-                            <!--  Issue Key  -->
-                            <TextBlock
-                                Margin="0,0,5,0"
-                                FontWeight="Bold"
-                                Style="{StaticResource LightTextBlockStyle}"
-                                Text="{Binding Key}" />
-
                             <!--  Issue Summary  -->
-                            <TextBlock
-                                Style="{StaticResource LightTextBlockStyle}"
-                                Text="{Binding Fields.Summary}"
-                                TextWrapping="Wrap" />
+                            <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="{Binding Fields.Summary}" />
                         </DockPanel>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

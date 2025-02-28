@@ -35,7 +35,7 @@ namespace JiraClient
         private static string JIRA_BASE_URL;
         private static string USER_NAME;
         private static string API_TOKEN;
-
+        
         public MainWindow()
         {
             InitializeComponent();
@@ -58,7 +58,7 @@ namespace JiraClient
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authInfo);
 
                 // string apiUrl = $"/rest/api/latest/search?fields=issuetype,summary,description&maxResults=5000";
-                string apiUrl = $"/rest/api/latest/search?maxResults=5000";
+                string apiUrl = $"/rest/api/latest/search?jql=assignee=currentUser()&maxResult=5000";
 
                 Stopwatch sw = Stopwatch.StartNew();
                 HttpResponseMessage response = await client.GetAsync(apiUrl);
@@ -126,6 +126,14 @@ namespace JiraClient
         {
             Win32DllWrappers.UnregisterHotKey(new System.Windows.Interop.WindowInteropHelper(this).Handle, HOTKEY_ID);
             base.OnClosed(e);
+        }
+
+        private void OnIssueTypeButtonClick(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Controls.Button button = sender as System.Windows.Controls.Button;
+            Debug.Assert(button != null);
+
+            _ = Logger.Log(MessageType.Info, $"{button.Content} Button Clicked");
         }
     }
 }

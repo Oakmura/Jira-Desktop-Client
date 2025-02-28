@@ -23,7 +23,10 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal">
+        <StackPanel
+            Grid.Row="0"
+            HorizontalAlignment="Center"
+            Orientation="Horizontal">
             <Button
                 x:Name="createIssueButton"
                 Margin="0,0,5,0"
@@ -43,7 +46,7 @@
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" MinWidth="300" />
+                <ColumnDefinition Width="400" MinWidth="300" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
@@ -91,8 +94,8 @@
                     VerticalAlignment="Top"
                     Background="Transparent" />
 
-                <Grid Grid.Row="1">
-                    <views:LoggerView Grid.Column="1" Margin="0,5,0,0" />
+                <Grid Grid.Row="1" Margin="0,5,0,0">
+                    <views:LoggerView Grid.Column="1" />
                 </Grid>
             </Grid>
         </Grid>
