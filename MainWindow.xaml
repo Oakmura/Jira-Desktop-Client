@@ -22,11 +22,29 @@
             <RowDefinition Height="32" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal" />
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Button
+                x:Name="createIssueButton"
+                Margin="0,0,5,0"
+                Click="OnIssueTypeButtonClick"
+                Content="Create Issue" />
+            <Button
+                x:Name="deleteIssueButton"
+                Margin="0,0,5,0"
+                Click="OnIssueTypeButtonClick"
+                Content="Delete Issue" />
+            <Button
+                x:Name="viewIssueButton"
+                Margin="0,0,5,0"
+                Click="OnIssueTypeButtonClick"
+                Content="View Issue" />
+        </StackPanel>
+
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" MinWidth="300" />
                 <ColumnDefinition />
-                <ColumnDefinition Width="Auto" MinWidth="250" />
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Column="0">
@@ -34,20 +52,20 @@
                     <RowDefinition />
                     <RowDefinition Height="300" MinHeight="300" />
                 </Grid.RowDefinitions>
-
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <views:LoggerView Grid.Column="1" Margin="0,5,0,0" />
-                </Grid>
+                <views:IssueListView
+                    x:Name="issueListView"
+                    Grid.Row="0"
+                    Background="{StaticResource GrayBrush2}" />
                 <GridSplitter
                     Grid.Row="1"
                     Height="5"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Top"
                     Background="Transparent" />
+                <Grid
+                    Grid.Row="1"
+                    Margin="0,5,0,0"
+                    Background="{StaticResource GrayBrush2}" />
             </Grid>
 
             <GridSplitter
@@ -55,25 +73,27 @@
                 Width="5"
                 HorizontalAlignment="Left"
                 Background="Transparent" />
-            <Grid
-                Grid.Column="1"
-                Margin="5,0,0,0"
-                Background="{StaticResource GrayBrush1}">
+
+            <Grid Grid.Column="1" Margin="5,0,0,0">
                 <Grid.RowDefinitions>
                     <RowDefinition />
-                    <RowDefinition />
+                    <RowDefinition Height="Auto" MinHeight="300" />
                 </Grid.RowDefinitions>
-                <views:IssueListView Grid.Row="0" x:Name="issueListView" Background="{StaticResource GrayBrush2}"/>
+
+                <UserControl Grid.Row="0">
+                    <Grid Background="{StaticResource GrayBrush2}" />
+                </UserControl>
+
                 <GridSplitter
                     Grid.Row="1"
                     Height="5"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Top"
                     Background="Transparent" />
-                <UserControl
-                    Grid.Row="1"
-                    Margin="0,5,0,0"
-                    Background="{StaticResource GrayBrush2}" />
+
+                <Grid Grid.Row="1">
+                    <views:LoggerView Grid.Column="1" Margin="0,5,0,0" />
+                </Grid>
             </Grid>
         </Grid>
 
