@@ -1,0 +1,149 @@
+﻿<UserControl
+    x:Class="JiraClient.Views.CreateIssueView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:JiraClient.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Orientation="Vertical">
+
+            <TextBlock
+                Margin="0,0,0,10"
+                FontSize="20"
+                FontWeight="Bold"
+                Style="{StaticResource LightTextBlockStyle}"
+                Text="Create Issue" />
+
+            <!--  Project Selector  -->
+            <ComboBox
+                Margin="0,0,0,5"
+                Background="Yellow"
+                Foreground="{StaticResource FontBrush}"
+                ItemsSource="{Binding Projects}"
+                SelectedItem="{Binding SelectedProject}">
+                <ComboBox.ItemContainerStyle>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Background" Value="Yellow" />
+                        <Setter Property="BorderBrush" Value="Yellow" />
+                    </Style>
+                </ComboBox.ItemContainerStyle>
+            </ComboBox>
+
+            <!--  Issue Type  -->
+            <ComboBox
+                Margin="0,0,0,5"
+                Background="{StaticResource GrayBrush3}"
+                ItemsSource="{Binding IssueTypes}"
+                SelectedItem="{Binding SelectedIssueType}" />
+
+            <!--  Summary  -->
+            <TextBlock
+                FontWeight="SemiBold"
+                Style="{StaticResource LightTextBlockStyle}"
+                Text="Summary" />
+            <TextBox
+                Margin="0,0,0,5"
+                Background="{StaticResource GrayBrush3}"
+                BorderThickness="0"
+                Text="{Binding Summary}" />
+
+            <!--  Description  -->
+            <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="Description" />
+            <TextBox
+                Height="100"
+                Margin="0,0,0,5"
+                AcceptsReturn="True"
+                Background="{StaticResource GrayBrush3}"
+                BorderThickness="0"
+                Text="{Binding Description}"
+                VerticalScrollBarVisibility="Auto" />
+
+            <!--  Labels  -->
+            <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="Labels" />
+            <ComboBox
+                Margin="0,0,0,5"
+                IsEditable="True"
+                ItemsSource="{Binding Labels}"
+                SelectedItem="{Binding SelectedLabel}" />
+
+            <StackPanel>
+                <!--  Priority  -->
+                <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="Priority" />
+                <ComboBox
+                    Margin="0,0,0,5"
+                    ItemsSource="{Binding Priorities}"
+                    SelectedItem="{Binding SelectedPriority}" />
+
+                <!--  Estimates  -->
+                <StackPanel Margin="0,0,0,5" Orientation="Horizontal">
+                    <StackPanel Margin="0,0,10,0">
+                        <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="Original estimate" />
+                        <TextBox
+                            Background="{StaticResource GrayBrush3}"
+                            BorderThickness="0"
+                            Text="{Binding OriginalEstimate}" />
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="Remaining estimate" />
+                        <TextBox
+                            Background="{StaticResource GrayBrush3}"
+                            BorderThickness="0"
+                            Text="{Binding RemainingEstimate}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!--  Start Date  -->
+                <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="Start date" />
+                <DatePicker
+                    Margin="0,0,0,5"
+                    BorderThickness="0"
+                    SelectedDate="{Binding StartDate}" />
+
+                <!--  Attachment  -->
+                <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="Attachment" />
+                <Border
+                    Margin="0,0,0,5"
+                    Padding="20"
+                    HorizontalAlignment="Stretch"
+                    Background="{StaticResource GrayBrush3}"
+                    BorderBrush="Gray"
+                    BorderThickness="0">
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Style="{StaticResource LightTextBlockStyle}"
+                        Text="Drop files or click to browse" />
+                    <!--  Drag & Drop 파일 처리는 코드비하인드에서  -->
+                </Border>
+
+                <!--  Due Date  -->
+                <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="Due date" />
+                <DatePicker
+                    Margin="0,0,0,5"
+                    BorderThickness="0"
+                    SelectedDate="{Binding DueDate}" />
+
+                <!--  Assignee  -->
+                <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="Assignee" />
+                <ComboBox
+                    IsEditable="True"
+                    ItemsSource="{Binding Assignees}"
+                    SelectedItem="{Binding SelectedAssignee}" />
+            </StackPanel>
+
+            <!--  Submit  -->
+            <Button
+                Width="100"
+                Margin="0,10,0,0"
+                HorizontalAlignment="Right"
+                Command="{Binding SubmitIssueCommand}"
+                Content="Submit" />
+        </StackPanel>
+    </ScrollViewer>
+
+</UserControl>

@@ -29,4 +29,8 @@
     <Resource Include="Resources\jira-icon.ico" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="UserData\" />
+  </ItemGroup>
+
 </Project>

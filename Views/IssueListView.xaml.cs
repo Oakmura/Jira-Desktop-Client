@@ -15,13 +15,5 @@ namespace JiraClient.Views
         {
             InitializeComponent();
         }
-
-        private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            JiraIssueResponse jiraResponse = e.NewValue as JiraIssueResponse;
-            Debug.Assert(jiraResponse != null);
-
-            _ = Logger.Log(MessageType.Info, $"StartAt: {jiraResponse.StartAt}, MaxResults: {jiraResponse.MaxResults}, Total: {jiraResponse.Total}");
-        }
     }
 }
