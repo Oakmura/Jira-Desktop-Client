@@ -13,9 +13,12 @@
             VerticalScrollBarVisibility="Auto">
 
             <TreeView
+                x:Name="IssueTreeView"
                 Background="{StaticResource GrayBrush2}"
                 BorderThickness="0"
-                ItemsSource="{Binding}">
+                ItemsSource="{Binding}"
+                MouseDoubleClick="SelectedIssueDoubleClick"
+                SelectedItemChanged="SelectedIssueChanged">
 
                 <TreeView.Resources>
                     <Style TargetType="TreeViewItem">
@@ -34,6 +37,12 @@
                         <HierarchicalDataTemplate.ItemTemplate>
                             <DataTemplate>
                                 <DockPanel ToolTip="{Binding Fields.Description}">
+                                    <DockPanel.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Click="DeleteIssueButtonClick" Header="Delete Issue" />
+                                        </ContextMenu>
+                                    </DockPanel.ContextMenu>
+
                                     <DockPanel.Style>
                                         <Style TargetType="DockPanel">
                                             <Setter Property="Background" Value="Transparent" />

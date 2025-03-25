@@ -22,22 +22,16 @@
             <!--  Project Selector  -->
             <ComboBox
                 Margin="0,0,0,5"
-                Background="Yellow"
                 Foreground="{StaticResource FontBrush}"
+                IsEditable="True"
                 ItemsSource="{Binding Projects}"
-                SelectedItem="{Binding SelectedProject}">
-                <ComboBox.ItemContainerStyle>
-                    <Style TargetType="ComboBoxItem">
-                        <Setter Property="Background" Value="Yellow" />
-                        <Setter Property="BorderBrush" Value="Yellow" />
-                    </Style>
-                </ComboBox.ItemContainerStyle>
-            </ComboBox>
+                SelectedItem="{Binding SelectedProject}" />
 
             <!--  Issue Type  -->
             <ComboBox
                 Margin="0,0,0,5"
-                Background="{StaticResource GrayBrush3}"
+                Foreground="{StaticResource FontBrush}"
+                IsEditable="True"
                 ItemsSource="{Binding IssueTypes}"
                 SelectedItem="{Binding SelectedIssueType}" />
 
@@ -50,6 +44,7 @@
                 Margin="0,0,0,5"
                 Background="{StaticResource GrayBrush3}"
                 BorderThickness="0"
+                Foreground="{StaticResource FontBrush}"
                 Text="{Binding Summary}" />
 
             <!--  Description  -->
@@ -60,6 +55,7 @@
                 AcceptsReturn="True"
                 Background="{StaticResource GrayBrush3}"
                 BorderThickness="0"
+                Foreground="{StaticResource FontBrush}"
                 Text="{Binding Description}"
                 VerticalScrollBarVisibility="Auto" />
 
@@ -67,18 +63,21 @@
             <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="Labels" />
             <ComboBox
                 Margin="0,0,0,5"
+                Foreground="{StaticResource FontBrush}"
                 IsEditable="True"
                 ItemsSource="{Binding Labels}"
                 SelectedItem="{Binding SelectedLabel}" />
 
-            <StackPanel>
-                <!--  Priority  -->
-                <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="Priority" />
-                <ComboBox
-                    Margin="0,0,0,5"
-                    ItemsSource="{Binding Priorities}"
-                    SelectedItem="{Binding SelectedPriority}" />
+            <!--  Priority  -->
+            <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="Priority" />
+            <ComboBox
+                Margin="0,0,0,5"
+                Foreground="{StaticResource FontBrush}"
+                IsEditable="True"
+                ItemsSource="{Binding Priorities}"
+                SelectedItem="{Binding SelectedPriority}" />
 
+            <StackPanel>
                 <!--  Estimates  -->
                 <StackPanel Margin="0,0,0,5" Orientation="Horizontal">
                     <StackPanel Margin="0,0,10,0">
@@ -86,6 +85,7 @@
                         <TextBox
                             Background="{StaticResource GrayBrush3}"
                             BorderThickness="0"
+                            Foreground="{StaticResource FontBrush}"
                             Text="{Binding OriginalEstimate}" />
                     </StackPanel>
                     <StackPanel>
@@ -93,6 +93,7 @@
                         <TextBox
                             Background="{StaticResource GrayBrush3}"
                             BorderThickness="0"
+                            Foreground="{StaticResource FontBrush}"
                             Text="{Binding RemainingEstimate}" />
                     </StackPanel>
                 </StackPanel>
@@ -131,6 +132,7 @@
                 <!--  Assignee  -->
                 <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="Assignee" />
                 <ComboBox
+                    Foreground="{StaticResource FontBrush}"
                     IsEditable="True"
                     ItemsSource="{Binding Assignees}"
                     SelectedItem="{Binding SelectedAssignee}" />

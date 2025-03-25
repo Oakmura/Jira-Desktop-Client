@@ -27,7 +27,20 @@ namespace JiraClient.ViewModels
             }
         }
 
-        private IssueListView mIssueListView;
+        private UserControl mIssueListView;
+        public UserControl IssueListView
+        {
+            get => mIssueListView;
+            set
+            {
+                if (mIssueListView != value)
+                {
+                    mIssueListView = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private IssueListVM mIssueListVM;
         private ViewIssueView mViewIssueView;
         private ViewIssueVM mViewIssueVM;
@@ -51,11 +64,11 @@ namespace JiraClient.ViewModels
 
             mIssueListView = new IssueListView();
             mIssueListVM = new IssueListVM();
-            mIssueListView.DataContext = mIssueListVM;
+            mIssueListView.DataContext = mIssueListVM.JiraIssueResponses;
 
             mViewIssueView = new ViewIssueView();
             mViewIssueVM = new ViewIssueVM();
-            mViewIssueView.DataContext = mViewIssueVM;
+            // mViewIssueView.DataContext = mViewIssueVM;
 
             mCreateFilterView = new CreateFilterView();
             mCreateFilterVM = new CreateFilterVM();
@@ -96,6 +109,19 @@ namespace JiraClient.ViewModels
             mLastRefreshTime = DateTime.Now;
         }
 
+        public void OnSelectedIssueChanged(JiraIssue jiraIssue)
+        {
+            mViewIssueView.DataContext = jiraIssue;
+            mViewIssueVM.OnSelectedIssueChanged(jiraIssue);
+        }
+
+        public void SwitchToIssueDetailView(JiraIssue jiraIssue)
+        {
+            mViewIssueView.DataContext = jiraIssue;
+            CurrentView = mViewIssueView;
+            mViewIssueVM.OnSelectedIssueChanged(jiraIssue);
+        }
+
         private void OnSwitchViewCommand(string action)
         {
             _ = Logger.Log(MessageType.Info, $"Switching to {action} View");
@@ -120,6 +146,10 @@ namespace JiraClient.ViewModels
         private async Task initialize()
         {
             JiraIssueResponses = await JiraAPI.fetchAllJiraIssues();
+            foreach (JiraIssueResponse response in JiraIssueResponses)
+            {
+                mIssueListVM.JiraIssueResponses.Add(response);
+            }
 
             mbInitialized = true;
         }
