@@ -8,8 +8,11 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/Dictionaries/Colors.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Dictionaries/ComboBoxTemplates.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Dictionaries/DatePickerTemplates.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Dictionaries/ControlTemplates.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>
