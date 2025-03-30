@@ -22,7 +22,7 @@ namespace JiraClient.Models
     public class JiraIssue
     {
         [JsonProperty("id")]
-        public int ID { get; set; } // "id": "13688"
+        public string ID { get; set; } // "id": "13688"
 
         [JsonProperty("key")]
         public string Key { get; set; } // "key": "VFS-36"
@@ -91,7 +91,7 @@ namespace JiraClient.Models
     public class Priority
     {
         [JsonProperty("id")]
-        public int ID { get; set; }
+        public string ID { get; set; }
 
         [JsonProperty("name")]
         public string Name { get; set; } // "Medium"
@@ -103,7 +103,7 @@ namespace JiraClient.Models
     public class Status
     {
         [JsonProperty("id")]
-        public int ID { get; set; }
+        public string ID { get; set; }
 
         [JsonProperty("name")]
         public string Name { get; set; } // "Open"
@@ -115,7 +115,7 @@ namespace JiraClient.Models
     public class StatusCategory
     {
         [JsonProperty("id")]
-        public int ID { get; set; }
+        public string ID { get; set; }
 
         [JsonProperty("key")]
         public string Key { get; set; } // "done"
@@ -127,7 +127,7 @@ namespace JiraClient.Models
     public class User // Add avatarUrls if needed
     {
         [JsonProperty("accountId")]
-        public int AccountID { get; set; }
+        public string AccountID { get; set; }
 
         [JsonProperty("displayName")]
         public string DisplayName { get; set; } // "노재우"
@@ -136,7 +136,7 @@ namespace JiraClient.Models
     public class IssueType // Add iconUrl if needed
     {
         [JsonProperty("id")]
-        public int ID { get; set; }
+        public string ID { get; set; }
 
         [JsonProperty("name")]
         public string Name { get; set; } // Task, Task Request"
@@ -148,7 +148,7 @@ namespace JiraClient.Models
     public class Project // Add avatarUrls if needed
     {
         [JsonProperty("id")]
-        public int ID { get; set; }
+        public string ID { get; set; }
 
         [JsonProperty("key")]
         public string Key { get; set; } // "VFS, SVEZ"
@@ -160,7 +160,7 @@ namespace JiraClient.Models
     public class Resolution
     {
         [JsonProperty("id")]
-        public int ID { get; set; }
+        public string ID { get; set; }
 
         [JsonProperty("name")]
         public string Name { get; set; } // "Done"
@@ -169,7 +169,7 @@ namespace JiraClient.Models
     public class IssueLink
     {
         [JsonProperty("id")]
-        public int ID { get; set; }
+        public string ID { get; set; }
 
         [JsonProperty("type")]
         public IssueLinkType Type { get; set; }
@@ -181,7 +181,7 @@ namespace JiraClient.Models
     public class IssueLinkType
     {
         [JsonProperty("id")]
-        public int ID { get; set; }
+        public string ID { get; set; }
 
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -196,7 +196,7 @@ namespace JiraClient.Models
     public class OutwardIssue
     {
         [JsonProperty("id")]
-        public int ID { get; set; }
+        public string ID { get; set; }
 
         [JsonProperty("key")]
         public string Key { get; set; }
