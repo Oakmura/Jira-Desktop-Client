@@ -28,12 +28,13 @@
 
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Issues}">
+                        <!--  Root Node Title  -->
                         <TextBlock
                             FontWeight="Bold"
-                            Foreground="{StaticResource DisabledFontBrush}"
-                            Text="{Binding Issues.Count, StringFormat='{}{0} Issues'}" />
+                            Foreground="{StaticResource FontBrush}"
+                            Text="{Binding ResponseTitle}" />
 
-                        <!--  Child Template (Each Issue)  -->
+                        <!--  Child Nodes Template  -->
                         <HierarchicalDataTemplate.ItemTemplate>
                             <DataTemplate>
                                 <DockPanel ToolTip="{Binding Fields.Description}">
@@ -86,6 +87,8 @@
 
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
+
+
             </TreeView>
 
         </ScrollViewer>

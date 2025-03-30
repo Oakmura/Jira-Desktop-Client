@@ -24,14 +24,14 @@
 
     <Window.InputBindings>
         <KeyBinding
-            Key="D1"
-            Command="{Binding SwitchViewCommand}"
-            CommandParameter="View Issue"
-            Modifiers="Control" />
-        <KeyBinding
             Key="D2"
             Command="{Binding SwitchViewCommand}"
             CommandParameter="Create Issue"
+            Modifiers="Control" />
+        <KeyBinding
+            Key="D1"
+            Command="{Binding SwitchViewCommand}"
+            CommandParameter="View Issue"
             Modifiers="Control" />
         <KeyBinding
             Key="D3"
@@ -57,14 +57,13 @@
             <Button
                 Margin="0,0,5,0"
                 Command="{Binding SwitchViewCommand}"
-                CommandParameter="View Issue"
-                Content="View Issue" />
+                CommandParameter="Create Issue"
+                Content="Create Issue" />
             <Button
                 Margin="0,0,5,0"
                 Command="{Binding SwitchViewCommand}"
-                CommandParameter="Create Issue"
-                Content="Create Issue" />
-
+                CommandParameter="View Issue"
+                Content="View Issue" />
             <Button
                 Margin="0,0,5,0"
                 Command="{Binding SwitchViewCommand}"

@@ -35,6 +35,7 @@
                 <GroupBox.HeaderTemplate>
                     <DataTemplate>
                         <TextBlock
+                            FontSize="16"
                             FontWeight="Bold"
                             Style="{StaticResource LightTextBlockStyle}"
                             Text="{Binding}" />
@@ -58,78 +59,91 @@
                     <TextBlock
                         Grid.Row="0"
                         Grid.Column="0"
+                        FontSize="14"
                         FontWeight="Bold"
                         Style="{StaticResource LightTextBlockStyle}"
                         Text="Type:" />
                     <TextBlock
                         Grid.Row="0"
                         Grid.Column="1"
+                        FontSize="14"
                         Style="{StaticResource LightTextBlockStyle}"
                         Text="{Binding Fields.IssueType.Name}" />
 
                     <TextBlock
                         Grid.Row="1"
                         Grid.Column="0"
+                        FontSize="14"
                         FontWeight="Bold"
                         Style="{StaticResource LightTextBlockStyle}"
                         Text="Status:" />
                     <TextBlock
                         Grid.Row="1"
                         Grid.Column="1"
+                        FontSize="14"
                         Style="{StaticResource LightTextBlockStyle}"
                         Text="{Binding Fields.Status.Name}" />
 
                     <TextBlock
                         Grid.Row="2"
                         Grid.Column="0"
+                        FontSize="14"
                         FontWeight="Bold"
                         Style="{StaticResource LightTextBlockStyle}"
                         Text="Priority:" />
                     <TextBlock
                         Grid.Row="2"
                         Grid.Column="1"
+                        FontSize="14"
                         Style="{StaticResource LightTextBlockStyle}"
                         Text="{Binding Fields.Priority.Name}" />
 
                     <TextBlock
                         Grid.Row="3"
                         Grid.Column="0"
+                        FontSize="14"
                         FontWeight="Bold"
                         Style="{StaticResource LightTextBlockStyle}"
                         Text="Created:" />
                     <TextBlock
                         Grid.Row="3"
                         Grid.Column="1"
+                        FontSize="14"
                         Style="{StaticResource LightTextBlockStyle}"
                         Text="{Binding Fields.FormattedCreated}" />
 
                     <TextBlock
                         Grid.Row="4"
                         Grid.Column="0"
+                        FontSize="14"
                         FontWeight="Bold"
                         Style="{StaticResource LightTextBlockStyle}"
                         Text="Updated:" />
                     <TextBlock
                         Grid.Row="4"
                         Grid.Column="1"
+                        FontSize="14"
                         Style="{StaticResource LightTextBlockStyle}"
                         Text="{Binding Fields.FormattedUpdated}" />
 
                     <TextBlock
                         Grid.Row="5"
                         Grid.Column="0"
+                        FontSize="14"
                         FontWeight="Bold"
                         Style="{StaticResource LightTextBlockStyle}"
                         Text="Resolution:" />
                     <TextBlock
                         Grid.Row="5"
                         Grid.Column="1"
+                        FontSize="14"
                         Style="{StaticResource LightTextBlockStyle}"
                         Text="{Binding Fields.Resolution.Name}" />
 
                     <TextBlock
                         Grid.Row="6"
                         Grid.Column="0"
+                        FontSize="14"
                         FontWeight="Bold"
                         Style="{StaticResource LightTextBlockStyle}"
                         Text="Labels:" />
@@ -139,6 +153,7 @@
                                 <DataTemplate>
                                     <TextBlock
                                         Margin="0,0,5,0"
+                                        FontSize="14"
                                         Style="{StaticResource LightTextBlockStyle}"
                                         Text="{Binding}" />
                                 </DataTemplate>
@@ -158,15 +173,25 @@
                 <GroupBox.HeaderTemplate>
                     <DataTemplate>
                         <TextBlock
+                            FontSize="16"
                             FontWeight="Bold"
                             Style="{StaticResource LightTextBlockStyle}"
                             Text="{Binding}" />
                     </DataTemplate>
                 </GroupBox.HeaderTemplate>
                 <StackPanel Margin="10">
-                    <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="{Binding Fields.Assignee.DisplayName, StringFormat='Assignee: {0}'}" />
-                    <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="{Binding Fields.Reporter.DisplayName, StringFormat='Reporter: {0}'}" />
-                    <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="{Binding Fields.Creator.DisplayName, StringFormat='Creator: {0}'}" />
+                    <TextBlock
+                        FontSize="14"
+                        Style="{StaticResource LightTextBlockStyle}"
+                        Text="{Binding Fields.Assignee.DisplayName, StringFormat='Assignee: {0}'}" />
+                    <TextBlock
+                        FontSize="14"
+                        Style="{StaticResource LightTextBlockStyle}"
+                        Text="{Binding Fields.Reporter.DisplayName, StringFormat='Reporter: {0}'}" />
+                    <TextBlock
+                        FontSize="14"
+                        Style="{StaticResource LightTextBlockStyle}"
+                        Text="{Binding Fields.Creator.DisplayName, StringFormat='Creator: {0}'}" />
                 </StackPanel>
             </GroupBox>
 
@@ -175,6 +200,7 @@
                 <GroupBox.HeaderTemplate>
                     <DataTemplate>
                         <TextBlock
+                            FontSize="16"
                             FontWeight="Bold"
                             Style="{StaticResource LightTextBlockStyle}"
                             Text="{Binding}" />
@@ -182,6 +208,7 @@
                 </GroupBox.HeaderTemplate>
                 <TextBlock
                     Margin="10"
+                    FontSize="14"
                     Style="{StaticResource LightTextBlockStyle}"
                     Text="{Binding Fields.Description}"
                     TextWrapping="Wrap" />
@@ -195,6 +222,7 @@
                 <GroupBox.HeaderTemplate>
                     <DataTemplate>
                         <TextBlock
+                            FontSize="16"
                             FontWeight="Bold"
                             Style="{StaticResource LightTextBlockStyle}"
                             Text="{Binding}" />
@@ -206,16 +234,19 @@
                             <StackPanel Margin="5" Orientation="Horizontal">
                                 <TextBlock
                                     Margin="0,0,5,0"
+                                    FontSize="14"
                                     FontWeight="Bold"
                                     Style="{StaticResource LightTextBlockStyle}"
                                     Text="{Binding Type.Outward}" />
                                 <TextBlock
                                     Margin="0,0,5,0"
+                                    FontSize="14"
                                     Style="{StaticResource LightTextBlockStyle}"
                                     Text="{Binding OutwardIssue.Key}" />
                                 <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="-" />
                                 <TextBlock
                                     Margin="5,0,0,0"
+                                    FontSize="14"
                                     Style="{StaticResource LightTextBlockStyle}"
                                     Text="{Binding OutwardIssue.Fields.Summary}" />
                             </StackPanel>

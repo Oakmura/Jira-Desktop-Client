@@ -43,21 +43,33 @@ namespace JiraClient.Utilities
 
                 Stopwatch sw = Stopwatch.StartNew();
 
+                List<string> filters = new List<string>(64);
                 List<Task<HttpResponseMessage>> tasks = new List<Task<HttpResponseMessage>>();
                 for (int i = 0; i < JQLs.Length; ++i)
                 {
-                    string apiURL = $"/rest/api/2/search?jql={JQLs[i]}&maxResults=100";
+                    if (JQLs[i].Trim().Length == 0)
+                    {
+                        continue;
+                    }
+
+                    string filterName = JQLs[i].Split(',')[0];
+                    string filterJQL = JQLs[i].Split(',')[1];
+
+                    string apiURL = $"/rest/api/2/search?jql={filterJQL}&maxResults=100";
                     tasks.Add(client.GetAsync(apiURL));
+                    filters.Add(filterName);
                 }
 
                 HttpResponseMessage[] responses = await Task.WhenAll(tasks);
-                foreach (HttpResponseMessage response in responses)
+                for (int i = 0; i < responses.Length; ++i)
                 {
+                    HttpResponseMessage response = responses[i];
                     if (response.IsSuccessStatusCode)
                     {
                         string result = await response.Content.ReadAsStringAsync();
                         JObject jsonResult = JObject.Parse(result);
                         JiraIssueResponse JiraResponse = JsonConvert.DeserializeObject<JiraIssueResponse>(result);
+                        JiraResponse.ResponseTitle = $"{filters[i]} ({JiraResponse.Issues.Count} Issues)";
 
                         jiraIssueResponses.Add(JiraResponse);
                     }

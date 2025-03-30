@@ -49,6 +49,7 @@ namespace JiraClient.ViewModels
         private CreateFilterView mCreateFilterView;
         private CreateFilterVM mCreateFilterVM;
 
+        public List<string> Filters { get; private set; } = new List<string>();
         public List<JiraIssueResponse> JiraIssueResponses { get; private set; } = new List<JiraIssueResponse>();
 
         bool mbInitialized = false;

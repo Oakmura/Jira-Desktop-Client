@@ -34,7 +34,7 @@
             FontSize="16"
             FontWeight="Bold"
             Style="{StaticResource LightTextBlockStyle}"
-            Text="{Binding Title}" />
+            Text="Filters and Custom JQL" />
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -46,6 +46,8 @@
             <ListBox
                 Grid.Column="0"
                 Margin="0,0,10,0"
+                DisplayMemberPath="FilterName"
+                FontSize="14"
                 ItemsSource="{Binding JqlFilters}"
                 SelectedItem="{Binding SelectedFilter, Mode=TwoWay}" />
 
@@ -58,6 +60,25 @@
 
             <!--  Filter Editor  -->
             <StackPanel Grid.Column="1" Orientation="Vertical">
+                <TextBlock
+                    d:Text="Filter Name"
+                    FontSize="14"
+                    Foreground="{StaticResource FontBrush}"
+                    Text="Filter Name" />
+                <TextBox
+                    Margin="0,0,0,10"
+                    Padding="5"
+                    Background="{StaticResource GrayBrush3}"
+                    BorderThickness="0"
+                    FontSize="14"
+                    Foreground="{StaticResource FontBrush}"
+                    Text="{Binding NewFilterName, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock
+                    d:Text="Filter JQL"
+                    FontSize="14"
+                    Foreground="{StaticResource FontBrush}"
+                    Text="Filter JQL" />
                 <TextBox
                     Margin="0,0,0,10"
                     Padding="5"
@@ -66,7 +87,7 @@
                     BorderThickness="0"
                     FontSize="14"
                     Foreground="{StaticResource FontBrush}"
-                    Text="{Binding NewFilterText, UpdateSourceTrigger=PropertyChanged}" />
+                    Text="{Binding NewFilterJQL, UpdateSourceTrigger=PropertyChanged}" />
 
                 <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
                     <Button

@@ -7,7 +7,6 @@ namespace JiraClient.ViewModels
 {
     public class IssueListVM : ViewModelBase
     {
-
         public ObservableCollection<JiraIssueResponse> JiraIssueResponses { get; set; } = new ObservableCollection<JiraIssueResponse>();
 
         public IssueListVM()
