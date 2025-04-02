@@ -59,7 +59,7 @@ namespace JiraClient.Utilities
             };
         }
 
-        public static async Task Log(MessageType type, string message,
+        public static async void Log(MessageType type, string message,
             [CallerFilePath] string file = "",
             [CallerMemberName] string caller = "",
             [CallerLineNumber] int line = 0)

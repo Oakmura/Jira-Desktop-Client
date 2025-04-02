@@ -17,7 +17,7 @@ namespace JiraClient.Utilities
             bool bSuccess = loadUserCredentials();
             if (!bSuccess)
             {
-                _ = Logger.Log(MessageType.Warning, "No User Credential Saved");
+                Logger.Log(MessageType.Warning, "No User Credential Saved");
                 return;
             }
         }
@@ -40,7 +40,7 @@ namespace JiraClient.Utilities
             }
             catch (Exception e)
             {
-                _ = Logger.Log(MessageType.Error, e.Message);
+                Logger.Log(MessageType.Error, e.Message);
                 return false;
             }
         }

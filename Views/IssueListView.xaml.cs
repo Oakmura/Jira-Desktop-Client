@@ -24,7 +24,7 @@ namespace JiraClient.Views
                 return;
             }
 
-            _ = Logger.Log(MessageType.Info, $"Selected issue changed: {selectedIssue.Key}");
+            Logger.Log(MessageType.Info, $"Selected issue changed: {selectedIssue.Key}");
 
             MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
             MainWindowVM mainWIndowVM = mainWindow.DataContext as MainWindowVM;
@@ -39,7 +39,7 @@ namespace JiraClient.Views
                 TreeViewItem issueTreeViewItem = TreeHelper.FindParent<TreeViewItem>(source);
                 if (issueTreeViewItem != null && issueTreeViewItem.DataContext is JiraIssue selectedIssue)
                 {
-                    _ = Logger.Log(MessageType.Info, $"Selected issue double-clicked: {selectedIssue.Key}");
+                    Logger.Log(MessageType.Info, $"Selected issue double-clicked: {selectedIssue.Key}");
 
                     var mainWindow = Application.Current.MainWindow as MainWindow;
                     var mainWindowVM = mainWindow.DataContext as MainWindowVM;
@@ -56,7 +56,7 @@ namespace JiraClient.Views
                 contextMenu.PlacementTarget is FrameworkElement fe &&
                 fe.DataContext is JiraIssue selectedIssue)
             {
-                _ = Logger.Log(MessageType.Warning, $"Delete issue: {selectedIssue.Key} (Not implemented yet)");
+                Logger.Log(MessageType.Warning, $"Delete issue: {selectedIssue.Key} (Not implemented yet)");
             }
         }
     }

@@ -25,7 +25,7 @@ namespace JiraClient.ViewModels
 
         public void OnRefreshCommand()
         {
-            _ = Logger.Log(MessageType.Info, "Refreshing ViewIssue ViewModel");
+            Logger.Log(MessageType.Info, "Refreshing ViewIssue ViewModel");
         }
 
         public void OnSelectedIssueChanged(JiraIssue jiraIssue)

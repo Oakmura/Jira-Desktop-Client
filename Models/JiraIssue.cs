@@ -22,7 +22,7 @@ namespace JiraClient.Models
     public class JiraIssue
     {
         [JsonProperty("id")]
-        public string ID { get; set; } // "id": "13688"
+        public int ID { get; set; } // "id": "13688"
 
         [JsonProperty("key")]
         public string Key { get; set; } // "key": "VFS-36"

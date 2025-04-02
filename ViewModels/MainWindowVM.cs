@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Windows.Controls;
 using System.Windows.Input;
 using JiraClient.Models;
+using System.Collections.ObjectModel;
 
 namespace JiraClient.ViewModels
 {
@@ -40,17 +41,18 @@ namespace JiraClient.ViewModels
                 }
             }
         }
-
         private IssueListVM mIssueListVM;
+
         private ViewIssueView mViewIssueView;
-        private ViewIssueVM mViewIssueVM;
+
         private CreateIssueView mCreateIssueView;
         private CreateIssueVM mCreateIssueVM;
+
         private CreateFilterView mCreateFilterView;
         private CreateFilterVM mCreateFilterVM;
 
-        public List<string> Filters { get; private set; } = new List<string>();
-        public List<JiraIssueResponse> JiraIssueResponses { get; private set; } = new List<JiraIssueResponse>();
+        Dictionary<int, JiraIssue> mJiraIssuesByID;
+        Dictionary<string, List<int>> mJiraIssuesByJQL;
 
         bool mbInitialized = false;
         private DateTime mLastRefreshTime = DateTime.MinValue;
@@ -65,11 +67,9 @@ namespace JiraClient.ViewModels
 
             mIssueListView = new IssueListView();
             mIssueListVM = new IssueListVM();
-            mIssueListView.DataContext = mIssueListVM.JiraIssueResponses;
+            mIssueListView.DataContext = mIssueListVM;
 
             mViewIssueView = new ViewIssueView();
-            mViewIssueVM = new ViewIssueVM();
-            // mViewIssueView.DataContext = mViewIssueVM;
 
             mCreateFilterView = new CreateFilterView();
             mCreateFilterVM = new CreateFilterVM();
@@ -86,7 +86,7 @@ namespace JiraClient.ViewModels
         {
             if (!mbInitialized)
             {
-                _ = Logger.Log(MessageType.Error, "MainWindow Not Initialized");
+                Logger.Log(MessageType.Error, "MainWindow Not Initialized");
 
                 return;
             }
@@ -96,14 +96,13 @@ namespace JiraClient.ViewModels
 
             if (secondsSinceLastRefresh < REFRESH_INTERVAL_SECONDS)
             {
-                _ = Logger.Log(MessageType.Info, $"Refresh skipped. Only {secondsSinceLastRefresh:F1} seconds since last refresh.");
+                Logger.Log(MessageType.Info, $"Refresh skipped. Only {secondsSinceLastRefresh:F1} seconds since last refresh.");
                 return;
             }
 
-            _ = Logger.Log(MessageType.Info, "Refreshing MainWindow ViewModel");
+            Logger.Log(MessageType.Info, "Refreshing MainWindow ViewModel");
 
-            mIssueListVM.OnRefreshCommand();
-            mViewIssueVM.OnRefreshCommand();
+            mIssueListVM.OnRefreshCommand(mJiraIssuesByID, mJiraIssuesByJQL);
             mCreateIssueVM.OnRefreshCommand();
             mCreateFilterVM.OnRefreshCommand();
 
@@ -113,19 +112,17 @@ namespace JiraClient.ViewModels
         public void OnSelectedIssueChanged(JiraIssue jiraIssue)
         {
             mViewIssueView.DataContext = jiraIssue;
-            mViewIssueVM.OnSelectedIssueChanged(jiraIssue);
         }
 
         public void SwitchToIssueDetailView(JiraIssue jiraIssue)
         {
             mViewIssueView.DataContext = jiraIssue;
             CurrentView = mViewIssueView;
-            mViewIssueVM.OnSelectedIssueChanged(jiraIssue);
         }
 
         private void OnSwitchViewCommand(string action)
         {
-            _ = Logger.Log(MessageType.Info, $"Switching to {action} View");
+            Logger.Log(MessageType.Info, $"Switching to {action} View");
 
             switch (action)
             {
@@ -146,11 +143,32 @@ namespace JiraClient.ViewModels
 
         private async Task initialize()
         {
-            JiraIssueResponses = await JiraAPI.fetchAllJiraIssues();
-            foreach (JiraIssueResponse response in JiraIssueResponses)
+            mJiraIssuesByID = await JiraAPI.fetchAllJiraIssues();
+            mJiraIssuesByJQL = await JiraAPI.fetchAllJiraIssuesJQL();
+
+            Stopwatch sw = Stopwatch.StartNew();
+            foreach (KeyValuePair<int, JiraIssue> issueKeyToIssue in mJiraIssuesByID)
             {
-                mIssueListVM.JiraIssueResponses.Add(response);
+                // if jira issue has parent, add itself as subtask to parent
+                if (issueKeyToIssue.Value.Fields.Parent != null)
+                {
+                    JiraIssue parent = mJiraIssuesByID[issueKeyToIssue.Value.Fields.Parent.ID];
+                    parent.Fields.SubTasks.Add(issueKeyToIssue.Value);
+                }
+
+                // if jira issue has subtasks, add them to parent
+                if (issueKeyToIssue.Value.Fields.SubTasks != null)
+                {
+                    foreach (JiraIssue subtask in issueKeyToIssue.Value.Fields.SubTasks)
+                    {
+                        subtask.Fields.Parent = issueKeyToIssue.Value;
+                    }
+                }
             }
+            sw.Stop();
+            Logger.Log(MessageType.Info, $"Parsing took {sw.Elapsed} seconds");
+
+            mIssueListVM.Setup(mJiraIssuesByID, mJiraIssuesByJQL);
 
             mbInitialized = true;
         }

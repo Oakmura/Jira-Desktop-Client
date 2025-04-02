@@ -24,12 +24,12 @@
 
     <Window.InputBindings>
         <KeyBinding
-            Key="D2"
+            Key="D1"
             Command="{Binding SwitchViewCommand}"
             CommandParameter="Create Issue"
             Modifiers="Control" />
         <KeyBinding
-            Key="D1"
+            Key="D2"
             Command="{Binding SwitchViewCommand}"
             CommandParameter="View Issue"
             Modifiers="Control" />

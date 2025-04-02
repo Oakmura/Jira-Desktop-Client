@@ -50,7 +50,7 @@ namespace JiraClient
         {
             WindowInteropHelper helper = new System.Windows.Interop.WindowInteropHelper(this);
             bool bSuccess = Win32DllWrappers.RegisterHotKey(helper.Handle, HOTKEY_ID, MOD_SHIFT, VK_F10);
-            _ = Logger.Log(MessageType.Info, $"Hot Key Registration: {bSuccess}");
+            Logger.Log(MessageType.Info, $"Hot Key Registration: {bSuccess}");
 
             System.Windows.Interop.ComponentDispatcher.ThreadFilterMessage += (ref System.Windows.Interop.MSG msg, ref bool handled) =>
             {

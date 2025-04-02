@@ -7,91 +7,84 @@
     mc:Ignorable="d">
 
     <Grid>
-        <ScrollViewer
+        <TreeView
+            x:Name="IssueTreeView"
             Background="{StaticResource GrayBrush2}"
-            HorizontalScrollBarVisibility="Auto"
-            VerticalScrollBarVisibility="Auto">
+            BorderThickness="0"
+            ItemsSource="{Binding HierarchicalIssueList}"
+            MouseDoubleClick="SelectedIssueDoubleClick"
+            ScrollViewer.HorizontalScrollBarVisibility="Auto"
+            ScrollViewer.VerticalScrollBarVisibility="Auto"
+            SelectedItemChanged="SelectedIssueChanged">
 
-            <TreeView
-                x:Name="IssueTreeView"
-                Background="{StaticResource GrayBrush2}"
-                BorderThickness="0"
-                ItemsSource="{Binding}"
-                MouseDoubleClick="SelectedIssueDoubleClick"
-                SelectedItemChanged="SelectedIssueChanged">
+            <TreeView.Resources>
+                <Style TargetType="TreeViewItem">
+                    <Setter Property="Margin" Value="-10,0,0,0" />
+                </Style>
+            </TreeView.Resources>
 
-                <TreeView.Resources>
-                    <Style TargetType="TreeViewItem">
-                        <Setter Property="Margin" Value="-10,0,0,0" />
-                    </Style>
-                </TreeView.Resources>
+            <!--  Root node: HierarchicalIssueList  -->
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                    <!--  Group name  -->
+                    <TextBlock
+                        FontWeight="Bold"
+                        Foreground="{StaticResource FontBrush}"
+                        Text="{Binding Name}" />
 
-                <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate ItemsSource="{Binding Issues}">
-                        <!--  Root Node Title  -->
-                        <TextBlock
-                            FontWeight="Bold"
-                            Foreground="{StaticResource FontBrush}"
-                            Text="{Binding ResponseTitle}" />
+                    <!--  Child nodes: JiraIssue items  -->
+                    <HierarchicalDataTemplate.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel ToolTip="{Binding Fields.Description}">
+                                <DockPanel.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Click="DeleteIssueButtonClick" Header="Delete Issue" />
+                                    </ContextMenu>
+                                </DockPanel.ContextMenu>
 
-                        <!--  Child Nodes Template  -->
-                        <HierarchicalDataTemplate.ItemTemplate>
-                            <DataTemplate>
-                                <DockPanel ToolTip="{Binding Fields.Description}">
-                                    <DockPanel.ContextMenu>
-                                        <ContextMenu>
-                                            <MenuItem Click="DeleteIssueButtonClick" Header="Delete Issue" />
-                                        </ContextMenu>
-                                    </DockPanel.ContextMenu>
+                                <DockPanel.Style>
+                                    <Style TargetType="DockPanel">
+                                        <Setter Property="Background" Value="Transparent" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background">
+                                                    <Setter.Value>
+                                                        <SolidColorBrush Opacity="0.5" Color="{StaticResource SelectedBackgroundColor}" />
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DockPanel.Style>
 
-                                    <DockPanel.Style>
-                                        <Style TargetType="DockPanel">
-                                            <Setter Property="Background" Value="Transparent" />
+                                <!--  Issue Key  -->
+                                <TextBlock
+                                    Margin="0,0,5,0"
+                                    FontWeight="Bold"
+                                    Text="{Binding Key}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="LightGreen" />
                                             <Style.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="Background">
-                                                        <Setter.Value>
-                                                            <SolidColorBrush Opacity="0.5" Color="{StaticResource SelectedBackgroundColor}" />
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                </Trigger>
+                                                <DataTrigger Binding="{Binding Fields.Status.Name}" Value="In Progress">
+                                                    <Setter Property="Foreground" Value="#ffffbb22" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Fields.Status.Name}" Value="Closed">
+                                                    <Setter Property="Foreground" Value="#ffff4455" />
+                                                </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
-                                    </DockPanel.Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
 
-                                    <!--  Issue Key  -->
-                                    <TextBlock
-                                        Margin="0,0,5,0"
-                                        FontWeight="Bold"
-                                        Text="{Binding Key}">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="Foreground" Value="LightGreen" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Fields.Status.Name}" Value="In Progress">
-                                                        <Setter Property="Foreground" Value="#ffffbb22" />
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding Fields.Status.Name}" Value="Closed">
-                                                        <Setter Property="Foreground" Value="#ffff4455" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
+                                <!--  Issue Summary  -->
+                                <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="{Binding Fields.Summary}" />
+                            </DockPanel>
+                        </DataTemplate>
+                    </HierarchicalDataTemplate.ItemTemplate>
 
-                                    <!--  Issue Summary  -->
-                                    <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="{Binding Fields.Summary}" />
-                                </DockPanel>
-                            </DataTemplate>
-                        </HierarchicalDataTemplate.ItemTemplate>
-
-                    </HierarchicalDataTemplate>
-                </TreeView.ItemTemplate>
-
-
-            </TreeView>
-
-        </ScrollViewer>
-
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
     </Grid>
 </UserControl>

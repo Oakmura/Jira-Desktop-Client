@@ -121,20 +121,20 @@ namespace JiraClient.ViewModels
 
         public void OnRefreshCommand()
         {
-            _ = Logger.Log(MessageType.Info, "Refreshing CreateFilter ViewModel");
+            Logger.Log(MessageType.Info, "Refreshing CreateFilter ViewModel");
         }
         
         private void onAddFilterCommand()
         {
             if (mFilterNameSet.Contains(NewFilterName) || mFilterJqlSet.Contains(NewFilterJQL))
             {
-                _ = Logger.Log(MessageType.Error, $"Filter name or JQL already exists");
+                Logger.Log(MessageType.Error, $"Filter name or JQL already exists");
                 return;
             }
 
             if (NewFilterName.Trim().Length == 0 || NewFilterJQL.Trim().Length == 0)
             {
-                _ = Logger.Log(MessageType.Error, $"Cannot create filter with empty name or JQL");
+                Logger.Log(MessageType.Error, $"Cannot create filter with empty name or JQL");
                 return;
             }
 
@@ -148,7 +148,7 @@ namespace JiraClient.ViewModels
             {
                 if (!Path.Exists(USER_JQL_PATH))
                 {
-                    _ = Logger.Log(MessageType.Error, $"User JQL Path: {USER_JQL_PATH} does not exist");
+                    Logger.Log(MessageType.Error, $"User JQL Path: {USER_JQL_PATH} does not exist");
                     return;
                 }
 
@@ -159,7 +159,7 @@ namespace JiraClient.ViewModels
             }
             catch (Exception e)
             {
-                _ = Logger.Log(MessageType.Error, e.Message);
+                Logger.Log(MessageType.Error, e.Message);
                 return;
             }
         }
@@ -192,7 +192,7 @@ namespace JiraClient.ViewModels
             {
                 if (!Path.Exists(USER_JQL_PATH))
                 {
-                    _ = Logger.Log(MessageType.Error, $"User JQL Path: {USER_JQL_PATH} does not exist");
+                    Logger.Log(MessageType.Error, $"User JQL Path: {USER_JQL_PATH} does not exist");
                     return;
                 }
 
@@ -217,7 +217,7 @@ namespace JiraClient.ViewModels
             }
             catch (Exception e)
             {
-                _ = Logger.Log(MessageType.Error, e.Message);
+                Logger.Log(MessageType.Error, e.Message);
                 return;
             }
         }
@@ -238,7 +238,7 @@ namespace JiraClient.ViewModels
             {
                 if (!Path.Exists(USER_JQL_PATH))
                 {
-                    _ = Logger.Log(MessageType.Error, $"User JQL Path: {USER_JQL_PATH} does not exist");
+                    Logger.Log(MessageType.Error, $"User JQL Path: {USER_JQL_PATH} does not exist");
                     return;
                 }
 
@@ -250,7 +250,7 @@ namespace JiraClient.ViewModels
             }
             catch (Exception e)
             {
-                _ = Logger.Log(MessageType.Error, e.Message);
+                Logger.Log(MessageType.Error, e.Message);
                 return;
             }
         }
@@ -263,7 +263,7 @@ namespace JiraClient.ViewModels
             {
                 if (!Path.Exists(USER_JQL_PATH))
                 {
-                    _ = Logger.Log(MessageType.Error, $"User JQL Path: {USER_JQL_PATH} does not exist");
+                    Logger.Log(MessageType.Error, $"User JQL Path: {USER_JQL_PATH} does not exist");
                     return;
                 }
 
@@ -286,7 +286,7 @@ namespace JiraClient.ViewModels
             }
             catch (Exception e)
             {
-                _ = Logger.Log(MessageType.Error, e.Message);
+                Logger.Log(MessageType.Error, e.Message);
                 return;
             }
         }

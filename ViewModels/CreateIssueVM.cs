@@ -29,7 +29,7 @@ namespace JiraClient.ViewModels
 
         public void OnRefreshCommand()
         {
-            _ = Logger.Log(MessageType.Info, "Refreshing CreateIssue ViewModel");
+            Logger.Log(MessageType.Info, "Refreshing CreateIssue ViewModel");
         }
     }
 }
