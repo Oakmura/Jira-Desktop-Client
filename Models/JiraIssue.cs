@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Windows.Media.Imaging;
+using Newtonsoft.Json;
 
 namespace JiraClient.Models
 {
@@ -77,15 +78,15 @@ namespace JiraClient.Models
 
         [JsonProperty("created")]
         public string Created { get; set; }
-        public string FormattedCreated => DateTime.Parse(Created).ToString("yyyy-MM-dd HH:mm");
+        public string FormattedCreated => Created == null ? null : DateTime.Parse(Created).ToString("yyyy-MM-dd HH:mm");
 
         [JsonProperty("updated")]
         public string Updated { get; set; }
-        public string FormattedUpdated => DateTime.Parse(Updated).ToString("yyyy-MM-dd HH:mm");
+        public string FormattedUpdated => Updated == null ? null : DateTime.Parse(Updated).ToString("yyyy-MM-dd HH:mm");
 
         [JsonProperty("duedate")]
         public string DueDate { get; set; }
-        public string FormattedDueDate => DateTime.Parse(DueDate).ToString("yyyy-MM-dd HH:mm");
+        public string FormattedDueDate => DueDate == null ? null : DateTime.Parse(DueDate).ToString("yyyy-MM-dd HH:mm");
     }
 
     public class Priority
@@ -143,6 +144,7 @@ namespace JiraClient.Models
 
         [JsonProperty("iconUrl")]
         public string IconURL { get; set; }
+        public byte[] IconImage { get; set; }
     }
 
     public class Project // Add avatarUrls if needed
@@ -174,9 +176,15 @@ namespace JiraClient.Models
         [JsonProperty("type")]
         public IssueLinkType Type { get; set; }
 
+        [JsonProperty("inwardIssue")]
+        public JiraIssue InwardIssue { get; set; }
+        public string InwardDescription => InwardIssue != null ? $"{Type.Inward} {InwardIssue.Key}" : "";
+
         [JsonProperty("outwardIssue")]
-        public OutwardIssue OutwardIssue { get; set; }
+        public JiraIssue OutwardIssue { get; set; }
+        public string OutwardDescription => OutwardIssue != null ? $"{Type.Inward} {OutwardIssue.Key}" : "";
     }
+
 
     public class IssueLinkType
     {
@@ -184,39 +192,12 @@ namespace JiraClient.Models
         public string ID { get; set; }
 
         [JsonProperty("name")]
-        public string Name { get; set; }
+        public string Name { get; set; } // "Cloners"
 
         [JsonProperty("inward")]
-        public string Inward { get; set; }
+        public string Inward { get; set; } // "is cloned by"
 
         [JsonProperty("outward")]
-        public string Outward { get; set; }
-    }
-
-    public class OutwardIssue
-    {
-        [JsonProperty("id")]
-        public string ID { get; set; }
-
-        [JsonProperty("key")]
-        public string Key { get; set; }
-
-        [JsonProperty("fields")]
-        public OutwardIssueFields Fields { get; set; }
-    }
-
-    public class OutwardIssueFields
-    {
-        [JsonProperty("summary")]
-        public string Summary { get; set; }
-
-        [JsonProperty("status")]
-        public Status Status { get; set; }
-
-        [JsonProperty("priority")]
-        public Priority Priority { get; set; }
-
-        [JsonProperty("issuetype")]
-        public IssueType IssueType { get; set; }
+        public string Outward { get; set; } // "clones"
     }
 }

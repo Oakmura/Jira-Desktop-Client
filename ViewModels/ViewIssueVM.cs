@@ -6,21 +6,36 @@ namespace JiraClient.ViewModels
 {
     public class ViewIssueVM : ViewModelBase
     {
-        private string mDescription;
-        public string Description
+        private JiraIssue mIssue;
+        public JiraIssue Issue
         {
-            get => mDescription;
+            get => mIssue;
             set
             {
-                if (mDescription != value)
+                if (mIssue != value)
                 {
-                    mDescription = value;
+                    mIssue = value;
                     OnPropertyChanged();
                 }
             }
         }
-        public ViewIssueVM() 
-        { 
+
+        private string mIssuePath;
+        public string IssuePath
+        {
+            get => mIssuePath;
+            set
+            {
+                if (mIssuePath != value)
+                {
+                    mIssuePath = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public ViewIssueVM()
+        {
         }
 
         public void OnRefreshCommand()
@@ -30,7 +45,30 @@ namespace JiraClient.ViewModels
 
         public void OnSelectedIssueChanged(JiraIssue jiraIssue)
         {
-            Description = jiraIssue.Fields.Description;
+            Issue = jiraIssue;
+            IssuePath = BuildIssuePath(jiraIssue);
+        }
+
+        private string BuildIssuePath(JiraIssue issue)
+        {
+            var path = new List<string>();
+            var current = issue;
+
+            while (current != null)
+            {
+                if (current.Fields != null)
+                {
+                    path.Insert(0, current.Key);
+                }
+                else
+                {
+                    path.Insert(0, current.Key);
+                }
+
+                current = current.Fields?.Parent;
+            }
+
+            return string.Join(" / ", path);
         }
     }
 }

@@ -251,7 +251,7 @@
                                 Grid.Column="0"
                                 HorizontalContentAlignment="Stretch"
                                 VerticalContentAlignment="Stretch"
-                                Background="{StaticResource GrayBrush3}"
+                                BorderThickness="0"
                                 Focusable="{TemplateBinding Focusable}" />
                             <Grid
                                 x:Name="PART_DisabledVisual"

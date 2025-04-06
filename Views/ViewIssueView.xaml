@@ -2,13 +2,18 @@
     x:Class="JiraClient.Views.ViewIssueView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:JiraClient.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="450"
+    d:DesignHeight="600"
     d:DesignWidth="800"
     mc:Ignorable="d">
 
-    <ScrollViewer>
+    <UserControl.Resources>
+        <converters:StringNullOrEmptyToVisibilityConverter x:Key="StringNullOrEmptyToVisibilityConverter" />
+    </UserControl.Resources>
+
+    <ScrollViewer DataContext="{Binding Issue}">
         <StackPanel Margin="0,0,0,20" Orientation="Vertical">
             <TextBlock
                 Margin="0,0,0,10"
@@ -19,16 +24,17 @@
 
             <!--  Issue Header  -->
             <TextBlock
-                FontSize="20"
+                FontSize="16"
                 FontWeight="Bold"
                 Style="{StaticResource LightTextBlockStyle}"
-                Text="{Binding Key}" />
-            <TextBlock
+                Text="{Binding DataContext.IssuePath, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+
+            <TextBox
                 Margin="0,5,0,10"
                 FontSize="16"
                 FontWeight="SemiBold"
-                Style="{StaticResource LightTextBlockStyle}"
-                Text="{Binding Fields.Summary}" />
+                Style="{StaticResource TextBoxStyle}"
+                Text="{Binding Fields.Summary, Mode=TwoWay}" />
 
             <!--  Basic Info Section  -->
             <GroupBox Margin="0,10,0,0" Header="Details">
@@ -63,12 +69,12 @@
                         FontWeight="Bold"
                         Style="{StaticResource LightTextBlockStyle}"
                         Text="Type:" />
-                    <TextBlock
+                    <TextBox
                         Grid.Row="0"
                         Grid.Column="1"
                         FontSize="14"
-                        Style="{StaticResource LightTextBlockStyle}"
-                        Text="{Binding Fields.IssueType.Name}" />
+                        Style="{StaticResource TextBoxStyle}"
+                        Text="{Binding Fields.IssueType.Name, Mode=TwoWay}" />
 
                     <TextBlock
                         Grid.Row="1"
@@ -77,12 +83,12 @@
                         FontWeight="Bold"
                         Style="{StaticResource LightTextBlockStyle}"
                         Text="Status:" />
-                    <TextBlock
+                    <TextBox
                         Grid.Row="1"
                         Grid.Column="1"
                         FontSize="14"
-                        Style="{StaticResource LightTextBlockStyle}"
-                        Text="{Binding Fields.Status.Name}" />
+                        Style="{StaticResource TextBoxStyle}"
+                        Text="{Binding Fields.Status.Name, Mode=TwoWay}" />
 
                     <TextBlock
                         Grid.Row="2"
@@ -91,12 +97,12 @@
                         FontWeight="Bold"
                         Style="{StaticResource LightTextBlockStyle}"
                         Text="Priority:" />
-                    <TextBlock
+                    <TextBox
                         Grid.Row="2"
                         Grid.Column="1"
                         FontSize="14"
-                        Style="{StaticResource LightTextBlockStyle}"
-                        Text="{Binding Fields.Priority.Name}" />
+                        Style="{StaticResource TextBoxStyle}"
+                        Text="{Binding Fields.Priority.Name, Mode=TwoWay}" />
 
                     <TextBlock
                         Grid.Row="3"
@@ -133,12 +139,12 @@
                         FontWeight="Bold"
                         Style="{StaticResource LightTextBlockStyle}"
                         Text="Resolution:" />
-                    <TextBlock
+                    <TextBox
                         Grid.Row="5"
                         Grid.Column="1"
                         FontSize="14"
-                        Style="{StaticResource LightTextBlockStyle}"
-                        Text="{Binding Fields.Resolution.Name}" />
+                        Style="{StaticResource TextBoxStyle}"
+                        Text="{Binding Fields.Resolution.Name, Mode=TwoWay}" />
 
                     <TextBlock
                         Grid.Row="6"
@@ -206,6 +212,7 @@
                             Text="{Binding}" />
                     </DataTemplate>
                 </GroupBox.HeaderTemplate>
+
                 <TextBlock
                     Margin="10"
                     FontSize="14"
@@ -231,24 +238,21 @@
                 <ItemsControl ItemsSource="{Binding Fields.IssueLinks}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Margin="5" Orientation="Horizontal">
+                            <StackPanel Orientation="Vertical">
                                 <TextBlock
                                     Margin="0,0,5,0"
                                     FontSize="14"
                                     FontWeight="Bold"
                                     Style="{StaticResource LightTextBlockStyle}"
-                                    Text="{Binding Type.Outward}" />
+                                    Text="{Binding InwardDescription}"
+                                    Visibility="{Binding InwardDescription, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}" />
                                 <TextBlock
                                     Margin="0,0,5,0"
                                     FontSize="14"
+                                    FontWeight="Bold"
                                     Style="{StaticResource LightTextBlockStyle}"
-                                    Text="{Binding OutwardIssue.Key}" />
-                                <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="-" />
-                                <TextBlock
-                                    Margin="5,0,0,0"
-                                    FontSize="14"
-                                    Style="{StaticResource LightTextBlockStyle}"
-                                    Text="{Binding OutwardIssue.Fields.Summary}" />
+                                    Text="{Binding OutwardDescription}"
+                                    Visibility="{Binding OutwardDescription, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}" />
                             </StackPanel>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>

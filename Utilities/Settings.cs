@@ -6,6 +6,7 @@ namespace JiraClient.Utilities
     {
         public static readonly string USER_JQL_PATH = "./../../../UserData/JQLs.txt";
         public static readonly string USER_CREDENTIAL_PATH = "./../../../UserData/Credentials.txt";
+        public static readonly string DEFAULT_PROJECT_KEY = "C10";
 
         public static string JiraBaseURL { get; private set; }
         public static string UserName { get; private set; }

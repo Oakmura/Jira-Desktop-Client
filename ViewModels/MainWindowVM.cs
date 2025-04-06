@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Windows.Controls;
 using System.Windows.Input;
 using JiraClient.Models;
-using System.Collections.ObjectModel;
 
 namespace JiraClient.ViewModels
 {
@@ -44,6 +43,7 @@ namespace JiraClient.ViewModels
         private IssueListVM mIssueListVM;
 
         private ViewIssueView mViewIssueView;
+        private ViewIssueVM mViewIssueVM;
 
         private CreateIssueView mCreateIssueView;
         private CreateIssueVM mCreateIssueVM;
@@ -70,6 +70,8 @@ namespace JiraClient.ViewModels
             mIssueListView.DataContext = mIssueListVM;
 
             mViewIssueView = new ViewIssueView();
+            mViewIssueVM = new ViewIssueVM();
+            mViewIssueView.DataContext = mViewIssueVM;
 
             mCreateFilterView = new CreateFilterView();
             mCreateFilterVM = new CreateFilterVM();
@@ -111,12 +113,12 @@ namespace JiraClient.ViewModels
 
         public void OnSelectedIssueChanged(JiraIssue jiraIssue)
         {
-            mViewIssueView.DataContext = jiraIssue;
+            mViewIssueVM.OnSelectedIssueChanged(jiraIssue);     
         }
 
         public void SwitchToIssueDetailView(JiraIssue jiraIssue)
         {
-            mViewIssueView.DataContext = jiraIssue;
+            mViewIssueVM.OnSelectedIssueChanged(jiraIssue);
             CurrentView = mViewIssueView;
         }
 
@@ -153,7 +155,29 @@ namespace JiraClient.ViewModels
                 if (issueKeyToIssue.Value.Fields.Parent != null)
                 {
                     JiraIssue parent = mJiraIssuesByID[issueKeyToIssue.Value.Fields.Parent.ID];
-                    parent.Fields.SubTasks.Add(issueKeyToIssue.Value);
+                    issueKeyToIssue.Value.Fields.Parent = parent;
+   
+                    if (parent.Fields.SubTasks == null)
+                    {
+                        parent.Fields.SubTasks = new List<JiraIssue>(128);
+                    }
+
+                    // 이미 subtask에 추가된 경우 overwrite
+                    bool bFound = false;
+                    for (int i = 0; i < parent.Fields.SubTasks.Count; ++i)
+                    {
+                        if (parent.Fields.SubTasks[i].ID == issueKeyToIssue.Value.ID)
+                        {
+                            parent.Fields.SubTasks[i] = issueKeyToIssue.Value;
+                            bFound = true;
+                            break;
+                        }
+                    }
+
+                    if (!bFound)
+                    {
+                        parent.Fields.SubTasks.Add(issueKeyToIssue.Value);
+                    }
                 }
 
                 // if jira issue has subtasks, add them to parent

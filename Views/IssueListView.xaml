@@ -13,7 +13,7 @@
             BorderThickness="0"
             ItemsSource="{Binding HierarchicalIssueList}"
             MouseDoubleClick="SelectedIssueDoubleClick"
-            ScrollViewer.HorizontalScrollBarVisibility="Auto"
+            ScrollViewer.HorizontalScrollBarVisibility="Hidden"
             ScrollViewer.VerticalScrollBarVisibility="Auto"
             SelectedItemChanged="SelectedIssueChanged">
 
@@ -26,16 +26,16 @@
             <!--  Root node: HierarchicalIssueList  -->
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                    <!--  Group name  -->
+                    <!--  Group Name  -->
                     <TextBlock
                         FontWeight="Bold"
                         Foreground="{StaticResource FontBrush}"
                         Text="{Binding Name}" />
 
-                    <!--  Child nodes: JiraIssue items  -->
+                    <!--  Child node: JiraIssue items  -->
                     <HierarchicalDataTemplate.ItemTemplate>
-                        <DataTemplate>
-                            <DockPanel ToolTip="{Binding Fields.Description}">
+                        <HierarchicalDataTemplate ItemsSource="{Binding Fields.SubTasks}">
+                            <DockPanel ToolTip="{Binding Fields.Summary}">
                                 <DockPanel.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Click="DeleteIssueButtonClick" Header="Delete Issue" />
@@ -56,6 +56,17 @@
                                         </Style.Triggers>
                                     </Style>
                                 </DockPanel.Style>
+
+                                <!--  Issue Type Icon 추가  -->
+
+                                <!--TODO
+                                <Image
+                                    Width="16"
+                                    Height="16"
+                                    Margin="0,0,5,0"
+                                    VerticalAlignment="Center"
+                                    Source="{Binding Fields.IssueType.IconImage}"
+                                    Stretch="Uniform" />-->
 
                                 <!--  Issue Key  -->
                                 <TextBlock
@@ -80,7 +91,58 @@
                                 <!--  Issue Summary  -->
                                 <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="{Binding Fields.Summary}" />
                             </DockPanel>
-                        </DataTemplate>
+
+                            <!--  재귀: Issue Fields.SubTasks 재귀적 표시  -->
+                            <HierarchicalDataTemplate.ItemTemplate>
+                                <HierarchicalDataTemplate ItemsSource="{Binding Fields.SubTasks}">
+                                    <DockPanel ToolTip="{Binding Fields.Description}">
+                                        <DockPanel.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Click="DeleteIssueButtonClick" Header="Delete Issue" />
+                                            </ContextMenu>
+                                        </DockPanel.ContextMenu>
+
+                                        <DockPanel.Style>
+                                            <Style TargetType="DockPanel">
+                                                <Setter Property="Background" Value="Transparent" />
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Background">
+                                                            <Setter.Value>
+                                                                <SolidColorBrush Opacity="0.5" Color="{StaticResource SelectedBackgroundColor}" />
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </DockPanel.Style>
+
+                                        <!--  재귀 하위 이슈들  -->
+                                        <TextBlock
+                                            Margin="0,0,5,0"
+                                            FontWeight="Bold"
+                                            Text="{Binding Key}">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="LightGreen" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Fields.Status.Name}" Value="In Progress">
+                                                            <Setter Property="Foreground" Value="#ffffbb22" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Fields.Status.Name}" Value="Closed">
+                                                            <Setter Property="Foreground" Value="#ffff4455" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+
+                                        <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="{Binding Fields.Summary}" />
+                                    </DockPanel>
+                                </HierarchicalDataTemplate>
+                            </HierarchicalDataTemplate.ItemTemplate>
+
+                        </HierarchicalDataTemplate>
                     </HierarchicalDataTemplate.ItemTemplate>
 
                 </HierarchicalDataTemplate>
