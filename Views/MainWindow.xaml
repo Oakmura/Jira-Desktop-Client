@@ -18,10 +18,6 @@
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
 
-    <Window.DataContext>
-        <vm:MainWindowVM />
-    </Window.DataContext>
-
     <Window.InputBindings>
         <KeyBinding
             Key="D1"
