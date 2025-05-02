@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using JiraClient.Common;
-using JiraClient.Models;
+using JiraClient.JiraAPI;
 using JiraClient.Utilities;
 
 namespace JiraClient.ViewModels

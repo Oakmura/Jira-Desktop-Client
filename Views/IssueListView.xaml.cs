@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using JiraClient.Models;
+using JiraClient.JiraAPI;
 using JiraClient.Utilities;
 using JiraClient.ViewModels;
 

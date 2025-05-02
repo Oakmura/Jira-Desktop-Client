@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using JiraClient.Common;
-using JiraClient.Models;
+using JiraClient.JiraAPI;
 using JiraClient.Utilities;
 
 namespace JiraClient.ViewModels
@@ -184,27 +184,27 @@ namespace JiraClient.ViewModels
 
         private async Task LoadDataAsync()
         {
-            var projects = await JiraAPI.FetchProjectsAsync();
+            var projects = await JiraReadAPI.ReadProjectsAsync();
             Projects.Clear();
             foreach (var p in projects)
                 Projects.Add(p);
 
-            var issueTypes = await JiraAPI.FetchIssueTypesAsync();
+            var issueTypes = await JiraReadAPI.ReadIssueTypesAsync();
             IssueTypes.Clear();
             foreach (var t in issueTypes)
                 IssueTypes.Add(t);
 
-            var labels = await JiraAPI.FetchLabelsAsync();
+            var labels = await JiraReadAPI.ReadLabelsAsync();
             Labels.Clear();
             foreach (var l in labels)
                 Labels.Add(l);
 
-            var priorities = await JiraAPI.FetchPrioritiesAsync();
+            var priorities = await JiraReadAPI.ReadPrioritiesAsync();
             Priorities.Clear();
             foreach (var p in priorities)
                 Priorities.Add(p);
 
-            var users = await JiraAPI.FetchAssignableUsersAsync();
+            var users = await JiraReadAPI.ReadAssignableUsersAsync();
             Assignees.Clear();
             foreach (var u in users)
                 Assignees.Add(u);
@@ -231,7 +231,7 @@ namespace JiraClient.ViewModels
                     }
                 };
 
-                var (success, createdIssue) = await JiraAPI.CreateJiraIssueAsync(issue);
+                var (success, createdIssue) = await JiraCreateAPI.CreateJiraIssueAsync(issue);
                 if (success)
                 {
                     Logger.Log(MessageType.Info, $"이슈 생성 성공: {createdIssue.Key}");

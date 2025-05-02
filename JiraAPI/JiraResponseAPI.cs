@@ -1,9 +1,8 @@
-﻿using System.Windows.Media.Imaging;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
-namespace JiraClient.Models
+namespace JiraClient.JiraAPI
 {
-    public class JiraIssueResponse
+    public class JiraResponseAPI
     {
         [JsonProperty("startAt")]
         public int StartAt { get; set; } // index of the first item returned in the page
@@ -31,7 +30,7 @@ namespace JiraClient.Models
         [JsonProperty("fields")]
         public JiraIssueFields Fields { get; set; }
     }
-    
+
     public class JiraIssueFields
     {
         [JsonProperty("parent")]

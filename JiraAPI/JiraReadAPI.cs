@@ -1,26 +1,22 @@
-﻿using JiraClient.Models;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Net.Http;
-using System.Text;
 using System.IO;
-using System.Windows.Media.Imaging;
-using System.Security.Policy;
-using System.Drawing;
+using JiraClient.Utilities;
 
-namespace JiraClient.Utilities
+namespace JiraClient.JiraAPI
 {
-    public static class JiraAPI
+    public static class JiraReadAPI
     {
-        public static async Task<Dictionary<int, JiraIssue>> fetchAllJiraIssues()
+        public static async Task<Dictionary<int, JiraIssue>> ReadAllJiraIssues()
         {
             Dictionary<int, JiraIssue> jiraIssues = new Dictionary<int, JiraIssue>(4096);
             int maxResults = 100;
             int total = 0;
 
-            using (HttpClient client = createHttpClient())
+            using (HttpClient client = JiraCommonAPI.CreateHttpClient())
             {
                 client.BaseAddress = new Uri(Settings.JiraBaseURL);
                 client.DefaultRequestHeaders.Accept.Clear();
@@ -57,7 +53,7 @@ namespace JiraClient.Utilities
                     {
                         string result = await response.Content.ReadAsStringAsync();
                         JObject jsonResult = JObject.Parse(result);
-                        JiraIssueResponse JiraResponse = JsonConvert.DeserializeObject<JiraIssueResponse>(result);
+                        JiraResponseAPI JiraResponse = JsonConvert.DeserializeObject<JiraResponseAPI>(result);
 
                         foreach (JiraIssue jiraIssue in JiraResponse.Issues)
                         {
@@ -78,7 +74,7 @@ namespace JiraClient.Utilities
         }
 
         // <JQL, [issue keys]>
-        public static async Task<Dictionary<string, List<int>>> fetchAllJiraIssuesJQL()
+        public static async Task<Dictionary<string, List<int>>> ReadAllJiraIssuesByJQL()
         {
             string[] JQLs;
             try
@@ -98,7 +94,7 @@ namespace JiraClient.Utilities
             }
 
             Dictionary<string, List<int>> issueKeysByJQL = new Dictionary<string, List<int>>(128);
-            using (HttpClient client = createHttpClient())
+            using (HttpClient client = JiraCommonAPI.CreateHttpClient())
             {
                 client.BaseAddress = new Uri(Settings.JiraBaseURL);
                 client.DefaultRequestHeaders.Accept.Clear();
@@ -131,7 +127,7 @@ namespace JiraClient.Utilities
                     {
                         string result = await response.Content.ReadAsStringAsync();
                         JObject jsonResult = JObject.Parse(result);
-                        JiraIssueResponse jiraResponse = JsonConvert.DeserializeObject<JiraIssueResponse>(result);
+                        JiraResponseAPI jiraResponse = JsonConvert.DeserializeObject<JiraResponseAPI>(result);
                         string filterName = filters[i];
 
                         foreach (JiraIssue jiraIssue in jiraResponse.Issues)
@@ -139,8 +135,8 @@ namespace JiraClient.Utilities
                             if (!issueKeysByJQL.ContainsKey(filterName))
                             {
                                 issueKeysByJQL[filterName] = new List<int>(1024);
-                            }                            
-                            
+                            }
+
                             issueKeysByJQL[filterName].Add(jiraIssue.ID);
                         }
                     }
@@ -157,37 +153,9 @@ namespace JiraClient.Utilities
             }
         }
 
-        public static async Task<(bool, JiraIssue)> CreateJiraIssueAsync(JiraIssue jiraIssue)
+        public static async Task<List<Project>> ReadProjectsAsync()
         {
-            string createIssueJson = JsonConvert.SerializeObject(jiraIssue);
-
-            using (HttpClient client = createHttpClient())
-            {
-                StringContent content = new StringContent(createIssueJson, Encoding.UTF8, "application/json");
-                HttpResponseMessage response = await client.PostAsync($"{Settings.JiraBaseURL}/rest/api/latest/issue", content);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    string responseContent = await response.Content.ReadAsStringAsync();
-                    JiraIssue createdIssue = JsonConvert.DeserializeObject<JiraIssue>(responseContent);
-
-                    Logger.Log(MessageType.Info, $"Created issue: {createdIssue.Key}");
-
-                    return (true, createdIssue);
-                }
-                else
-                {
-                    string error = await response.Content.ReadAsStringAsync();
-                    Logger.Log(MessageType.Error, $"이슈 생성 실패: {response.StatusCode}\n{error}");
-
-                    return (false, null);
-                }
-            }
-        }
-
-        public static async Task<List<Project>> FetchProjectsAsync()
-        {
-            using (HttpClient client = createHttpClient())
+            using (HttpClient client = JiraCommonAPI.CreateHttpClient())
             {
                 var response = await client.GetAsync($"{Settings.JiraBaseURL}/rest/api/latest/project");
                 response.EnsureSuccessStatusCode();
@@ -200,9 +168,9 @@ namespace JiraClient.Utilities
             }
         }
 
-        public static async Task<List<IssueType>> FetchIssueTypesAsync()
+        public static async Task<List<IssueType>> ReadIssueTypesAsync()
         {
-            using (HttpClient client = createHttpClient())
+            using (HttpClient client = JiraCommonAPI.CreateHttpClient())
             {
                 var response = await client.GetAsync($"{Settings.JiraBaseURL}/rest/api/latest/issuetype");
                 response.EnsureSuccessStatusCode();
@@ -215,68 +183,9 @@ namespace JiraClient.Utilities
             }
         }
 
-        /* TODO: use this to fetch also the icons (instead of FetchIssueTypesAsync)
-        public static async Task<List<IssueType>> FetchIssueTypesAsync()
+        public static async Task<List<string>> ReadLabelsAsync()
         {
-            using (HttpClient client = createHttpClient())
-            {
-                // 1. 이슈 타입 정보 가져오기
-                var response = await client.GetAsync($"{Settings.JiraBaseURL}/rest/api/latest/issuetype");
-                response.EnsureSuccessStatusCode();
-
-                var json = await response.Content.ReadAsStringAsync();
-                var issueTypes = JsonConvert.DeserializeObject<List<IssueType>>(json);
-
-                // 2. 각각의 이슈 타입 아이콘 가져오기
-                using (HttpClient imageClient = new HttpClient())
-                {
-                    foreach (var issueType in issueTypes)
-                    {
-                        if (!string.IsNullOrEmpty(issueType.IconURL))
-                        {
-                            try
-                            {
-                                byte[] icon = await response.Content.ReadAsByteArrayAsync();
-                                issueType.IconImage = icon;
-                            }
-                            catch (Exception ex)
-                            {
-                                Logger.Log(MessageType.Warning, $"아이콘 다운로드 실패: {issueType.Name}, {ex.Message}");
-                            }
-                        }
-                    }
-                }
-
-                Logger.Log(MessageType.Info, $"이슈 타입 {issueTypes.Count}개 가져옴");
-                return issueTypes;
-            }
-        }
-        */
-
-        public static async Task TestFetchIssueTypeIconsAsync()
-        {
-            string imageUrl = "https://sdb-jira.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/10309?size=medium";
-
-            using (HttpClient imageClient = new HttpClient())
-            {
-                try
-                {
-                    var response = await imageClient.GetAsync(imageUrl);
-                    response.EnsureSuccessStatusCode();
-
-                    byte[] data = await response.Content.ReadAsByteArrayAsync();
-                    Logger.Log(MessageType.Info, $"이미지 다운로드 성공: {imageUrl}, 크기: {data.Length} bytes");
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log(MessageType.Error, $"이미지 다운로드 실패: {ex.Message}");
-                }
-            }
-        }
-
-        public static async Task<List<string>> FetchLabelsAsync()
-        {
-            using (HttpClient client = createHttpClient())
+            using (HttpClient client = JiraCommonAPI.CreateHttpClient())
             {
                 HttpResponseMessage response = await client.GetAsync($"{Settings.JiraBaseURL}/rest/api/latest/label");
                 response.EnsureSuccessStatusCode();
@@ -291,9 +200,9 @@ namespace JiraClient.Utilities
             }
         }
 
-        public static async Task<List<Priority>> FetchPrioritiesAsync()
+        public static async Task<List<Priority>> ReadPrioritiesAsync()
         {
-            using (HttpClient client = createHttpClient())
+            using (HttpClient client = JiraCommonAPI.CreateHttpClient())
             {
                 var response = await client.GetAsync($"{Settings.JiraBaseURL}/rest/api/latest/priority");
                 response.EnsureSuccessStatusCode();
@@ -306,9 +215,9 @@ namespace JiraClient.Utilities
             }
         }
 
-        public static async Task<List<User>> FetchAssignableUsersAsync()
+        public static async Task<List<User>> ReadAssignableUsersAsync()
         {
-            using (HttpClient client = createHttpClient())
+            using (HttpClient client = JiraCommonAPI.CreateHttpClient())
             {
                 // DEFAULT project key로 C10을 사용
                 string projectKey = Settings.DEFAULT_PROJECT_KEY ?? "C10";
@@ -322,15 +231,6 @@ namespace JiraClient.Utilities
                 Logger.Log(MessageType.Info, $"Assignee {users.Count}명 가져옴");
                 return users;
             }
-        }
-
-        private static HttpClient createHttpClient()
-        {
-            HttpClient client = new HttpClient();
-            byte[] byteArray = Encoding.ASCII.GetBytes($"{Settings.UserName}:{Settings.ApiToken}");
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
-
-            return client;
         }
     }
 }

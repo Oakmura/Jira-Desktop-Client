@@ -4,7 +4,7 @@ using JiraClient.Views;
 using System.Diagnostics;
 using System.Windows.Controls;
 using System.Windows.Input;
-using JiraClient.Models;
+using JiraClient.JiraAPI;
 
 namespace JiraClient.ViewModels
 {
@@ -145,8 +145,8 @@ namespace JiraClient.ViewModels
 
         private async Task initialize()
         {
-            mJiraIssuesByID = await JiraAPI.fetchAllJiraIssues();
-            mJiraIssuesByJQL = await JiraAPI.fetchAllJiraIssuesJQL();
+            mJiraIssuesByID = await JiraReadAPI.ReadAllJiraIssues();
+            mJiraIssuesByJQL = await JiraReadAPI.ReadAllJiraIssuesByJQL();
 
             Stopwatch sw = Stopwatch.StartNew();
             foreach (KeyValuePair<int, JiraIssue> issueKeyToIssue in mJiraIssuesByID)
