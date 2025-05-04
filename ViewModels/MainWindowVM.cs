@@ -98,7 +98,7 @@ namespace JiraClient.ViewModels
 
             if (secondsSinceLastRefresh < REFRESH_INTERVAL_SECONDS)
             {
-                Logger.Log(MessageType.Info, $"Refresh skipped. Only {secondsSinceLastRefresh:F1} seconds since last refresh.");
+                Logger.Log(MessageType.Info, $"Refresh skipped. Only {secondsSinceLastRefresh:F1}/{REFRESH_INTERVAL_SECONDS:F1} seconds since last refresh.");
                 return;
             }
 

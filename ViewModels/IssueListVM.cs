@@ -1,11 +1,12 @@
 ﻿using System.Collections.ObjectModel;
+using System.Windows;
 using JiraClient.Common;
 using JiraClient.JiraAPI;
 using JiraClient.Utilities;
 
 namespace JiraClient.ViewModels
 {
-    // TODO: should change to ViewModelBase if one to dynamically update the list
+    // TODO: should change to ViewModelBase if want to dynamically update the list
     public class HierarchicalIssueList
     {
         public string Name { get; set; }
@@ -22,15 +23,18 @@ namespace JiraClient.ViewModels
 
         public void Setup(Dictionary<int, JiraIssue> jiraIssuesByID, Dictionary<string, List<int>> jiraIssuesByJQL)
         {
-            HierarchicalIssueList.Clear();
-            foreach (var issuesByJQL in jiraIssuesByJQL)
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                HierarchicalIssueList.Add(new HierarchicalIssueList
+                HierarchicalIssueList.Clear();
+                foreach (var issuesByJQL in jiraIssuesByJQL)
                 {
-                    Name = issuesByJQL.Key,
-                    Children = issuesByJQL.Value.Select(id => jiraIssuesByID[id]).ToList()
-                });
-            }
+                    HierarchicalIssueList.Add(new HierarchicalIssueList
+                    {
+                        Name = issuesByJQL.Key,
+                        Children = issuesByJQL.Value.Select(id => jiraIssuesByID[id]).ToList()
+                    });
+                }
+            });
         }
 
         public void OnRefreshCommand(Dictionary<int, JiraIssue> jiraIssuesByID, Dictionary<string, List<int>> jiraIssuesByJQL)
