@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Windows;
 using System.Windows.Input;
 using JiraClient.Common;
 using JiraClient.JiraAPI;
@@ -12,6 +10,8 @@ namespace JiraClient.ViewModels
 {
     public class CreateIssueVM : ViewModelBase
     {
+        private Dictionary<string, List<IssueType>> mJiraIssueTypeByProject;
+
         public ObservableCollection<Project> Projects { get; } = new ObservableCollection<Project>();
         private Project mSelectedProject;
         public Project SelectedProject
@@ -23,6 +23,9 @@ namespace JiraClient.ViewModels
                 {
                     mSelectedProject = value;
                     OnPropertyChanged();
+
+                    updateIssueTypes();
+                    _ = updateAssignableUsers();
                 }
             }
         }
@@ -52,21 +55,6 @@ namespace JiraClient.ViewModels
                 if (mSelectedLabel != value)
                 {
                     mSelectedLabel = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public ObservableCollection<Priority> Priorities { get; } = new ObservableCollection<Priority>();
-        private Priority mSelectedPriority;
-        public Priority SelectedPriority
-        {
-            get => mSelectedPriority;
-            set
-            {
-                if (mSelectedPriority != value)
-                {
-                    mSelectedPriority = value;
                     OnPropertyChanged();
                 }
             }
@@ -171,9 +159,49 @@ namespace JiraClient.ViewModels
             }
         }
 
-        public ICommand SubmitIssueCommand { get; }
+        private string mParentKey;
+        public string ParentKey
+        {
+            get => mParentKey;
+            set
+            {
+                if (mParentKey != value)
+                {
+                    mParentKey = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
-        private List<string> SelectedLabels { get; } = new List<string>();
+        private string mWorklogTimeSpent;
+        public string WorklogTimeSpent
+        {
+            get => mWorklogTimeSpent;
+            set
+            {
+                if (mWorklogTimeSpent != value)
+                {
+                    mWorklogTimeSpent = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private string mWorklogStarted;
+        public string WorklogStarted
+        {
+            get => mWorklogStarted;
+            set
+            {
+                if (mWorklogStarted != value)
+                {
+                    mWorklogStarted = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public ICommand SubmitIssueCommand { get; }
 
         public CreateIssueVM()
         {
@@ -182,63 +210,115 @@ namespace JiraClient.ViewModels
             _ = LoadDataAsync();
         }
 
+        public void OnRefreshCommand()
+        {
+            Logger.Log(MessageType.Info, "Refreshing CreateIssue ViewModel");
+        }
+
+        public async void ReadJiraIssueTypes(List<string> uniqueProjectKeys)
+        {
+            mJiraIssueTypeByProject = await JiraReadAPI.ReadIssueTypesAsync(uniqueProjectKeys);
+
+            updateIssueTypes();
+        }
+
         private async Task LoadDataAsync()
         {
             var projects = await JiraReadAPI.ReadProjectsAsync();
-            Projects.Clear();
-            foreach (var p in projects)
-                Projects.Add(p);
-
-            var issueTypes = await JiraReadAPI.ReadIssueTypesAsync();
-            IssueTypes.Clear();
-            foreach (var t in issueTypes)
-                IssueTypes.Add(t);
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                Projects.Clear();
+                foreach (var p in projects)
+                {
+                    Projects.Add(p);
+                }
+            });
 
             var labels = await JiraReadAPI.ReadLabelsAsync();
-            Labels.Clear();
-            foreach (var l in labels)
-                Labels.Add(l);
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                Labels.Clear();
+                foreach (var l in labels)
+                {
+                    Labels.Add(l);
+                }
+            });
 
-            var priorities = await JiraReadAPI.ReadPrioritiesAsync();
-            Priorities.Clear();
-            foreach (var p in priorities)
-                Priorities.Add(p);
-
-            var users = await JiraReadAPI.ReadAssignableUsersAsync();
-            Assignees.Clear();
-            foreach (var u in users)
-                Assignees.Add(u);
+            await updateAssignableUsers();
 
             Logger.Log(MessageType.Info, "CreateIssueVM 초기화 완료");
         }
 
         private async Task OnSubmitIssueAsync()
         {
+            if (SelectedProject == null)
+            {
+                Logger.Log(MessageType.Warning, "이슈 생성 실패: Project가 선택되지 않았습니다.");
+                return;
+            }
+
+            if (SelectedIssueType == null)
+            {
+                Logger.Log(MessageType.Warning, "이슈 생성 실패: Issue Type이 선택되지 않았습니다.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(Summary))
+            {
+                Logger.Log(MessageType.Warning, "이슈 생성 실패: Summary가 입력되지 않았습니다.");
+                return;
+            }
+
             try
             {
-                JiraIssue issue = new JiraIssue
+                CreateJiraIssueRequest issue = new CreateJiraIssueRequest
                 {
-                    Fields = new JiraIssueFields
+                    Fields = new CreateJiraIssueFields
                     {
-                        Project = SelectedProject,
-                        IssueType = SelectedIssueType,
+                        Project = new Project { Key = SelectedProject.Key },
+                        IssueType = new IssueType { ID = SelectedIssueType.ID },
                         Summary = Summary,
                         Description = Description,
-                        Labels = SelectedLabels.Count > 0 ? new List<string>(SelectedLabels) : (SelectedLabel != null ? new List<string> { SelectedLabel } : new List<string>()),
-                        Priority = SelectedPriority,
-                        Assignee = SelectedAssignee,
-                        DueDate = DueDate?.ToString("yyyy-MM-dd") // Jira API는 "yyyy-MM-dd" 형식 요구
-                    }
+                        Labels = !string.IsNullOrWhiteSpace(SelectedLabel) ? new List<string> { SelectedLabel } : null,
+                        Assignee = SelectedAssignee != null ? new User { AccountID = SelectedAssignee.AccountID } : null,
+                        DueDate = DueDate?.ToString("yyyy-MM-dd"),
+                        Timetracking = (!string.IsNullOrWhiteSpace(OriginalEstimate) || !string.IsNullOrWhiteSpace(RemainingEstimate))
+                            ? new JiraTimeTracking
+                            {
+                                OriginalEstimate = OriginalEstimate,
+                                RemainingEstimate = RemainingEstimate
+                            }
+                            : null,
+                        Parent = !string.IsNullOrWhiteSpace(ParentKey) ? new JiraIssue { Key = ParentKey } : null
+                    },
+
+                    Update = (!string.IsNullOrWhiteSpace(WorklogTimeSpent) && !string.IsNullOrWhiteSpace(WorklogStarted))
+                        ? new CreateJiraIssueUpdate
+                        {
+                            Worklog = new List<JiraWorklogAdd>
+                            {
+                                new JiraWorklogAdd
+                                {
+                                    Add = new JiraWorklogEntry
+                                    {
+                                        TimeSpent = WorklogTimeSpent,
+                                        Started = WorklogStarted
+                                    }
+                                }
+                            }
+                        }
+                        : null
                 };
 
-                var (success, createdIssue) = await JiraCreateAPI.CreateJiraIssueAsync(issue);
-                if (success)
+                (bool bSuccess, JiraIssue createdIssue) = await JiraCreateAPI.CreateJiraIssueAsync(issue);
+                if (bSuccess)
                 {
                     Logger.Log(MessageType.Info, $"이슈 생성 성공: {createdIssue.Key}");
+                    resetFields();
                 }
                 else
                 {
-                    Logger.Log(MessageType.Error, $"이슈 생성 실패");
+                    Logger.Log(MessageType.Error, "이슈 생성 실패");
                 }
             }
             catch (Exception ex)
@@ -247,9 +327,60 @@ namespace JiraClient.ViewModels
             }
         }
 
-        public void OnRefreshCommand()
+
+        private void updateIssueTypes()
         {
-            Logger.Log(MessageType.Info, "Refreshing CreateIssue ViewModel");
+            if (mJiraIssueTypeByProject == null)
+            {
+                Logger.Log(MessageType.Warning, "JiraIssueTypeByProject is null");
+                return;
+            }
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                IssueTypes.Clear();
+                if (SelectedProject != null && mJiraIssueTypeByProject.ContainsKey(SelectedProject.Key))
+                {
+                    foreach (var t in mJiraIssueTypeByProject[SelectedProject.Key])
+                    {
+                        IssueTypes.Add(t);
+                    }
+                }
+            });
+        }
+
+        private async Task updateAssignableUsers()
+        {
+            if (SelectedProject == null || string.IsNullOrEmpty(SelectedProject.Key))
+            {
+                return;
+            }
+
+            List<User> users = await JiraReadAPI.ReadAssignableUsersAsync(SelectedProject.Key);
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                Assignees.Clear();
+                foreach (User user in users)
+                {
+                    Assignees.Add(user);
+                }
+            });
+        }
+
+        private void resetFields()
+        {
+            SelectedIssueType = null;
+            Summary = string.Empty;
+            Description = string.Empty;
+            SelectedLabel = null;
+            SelectedAssignee = null;
+            OriginalEstimate = string.Empty;
+            RemainingEstimate = string.Empty;
+            StartDate = DateTime.Now;
+            DueDate = null;
+            ParentKey = string.Empty;
+            WorklogTimeSpent = string.Empty;
+            WorklogStarted = string.Empty;
         }
     }
 }

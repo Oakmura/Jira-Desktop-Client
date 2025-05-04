@@ -43,10 +43,7 @@ namespace JiraClient.JiraAPI
         public string Summary { get; set; } // "ChatGPT 온라인 강의 및 전파교육"
 
         [JsonProperty("description")]
-        public string Description { get; set; } // "ChatGPT 교육 수강\n* 전자 결제 제출 자료 (`교육훈련결과보고서`)\n** 전파 교육 사진\n** 참석자 서명 스캔본""
-
-        [JsonProperty("priority")]
-        public Priority Priority { get; set; }
+        public string Description { get; set; } // "ChatGPT 교육 수강\n* 전자 결제 제출 자료 (`교육훈련결과보고서`)\n** 전파 교육 사진\n** 참석자 서명 스캔본"
 
         [JsonProperty("status")]
         public Status Status { get; set; }
@@ -86,18 +83,6 @@ namespace JiraClient.JiraAPI
         [JsonProperty("duedate")]
         public string DueDate { get; set; }
         public string FormattedDueDate => DueDate == null ? null : DateTime.Parse(DueDate).ToString("yyyy-MM-dd HH:mm");
-    }
-
-    public class Priority
-    {
-        [JsonProperty("id")]
-        public string ID { get; set; }
-
-        [JsonProperty("name")]
-        public string Name { get; set; } // "Medium"
-
-        [JsonProperty("iconUrl")]
-        public string IconURL { get; set; }
     }
 
     public class Status

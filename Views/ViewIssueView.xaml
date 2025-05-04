@@ -91,20 +91,6 @@
                         Text="{Binding Fields.Status.Name, Mode=TwoWay}" />
 
                     <TextBlock
-                        Grid.Row="2"
-                        Grid.Column="0"
-                        FontSize="14"
-                        FontWeight="Bold"
-                        Style="{StaticResource LightTextBlockStyle}"
-                        Text="Priority:" />
-                    <TextBox
-                        Grid.Row="2"
-                        Grid.Column="1"
-                        FontSize="14"
-                        Style="{StaticResource TextBoxStyle}"
-                        Text="{Binding Fields.Priority.Name, Mode=TwoWay}" />
-
-                    <TextBlock
                         Grid.Row="3"
                         Grid.Column="0"
                         FontSize="14"

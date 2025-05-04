@@ -9,116 +9,6 @@
     d:DesignWidth="800"
     mc:Ignorable="d">
 
-    <UserControl.Resources>
-        <Style TargetType="ComboBox">
-            <Setter Property="Foreground" Value="{StaticResource FontBrush}" />
-            <Setter Property="Background" Value="{StaticResource GrayBrush3}" />
-            <Setter Property="BorderBrush" Value="{StaticResource GrayBrush3}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="1" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ComboBox">
-                        <Grid>
-                            <!--  박스 (Border)  -->
-                            <Border
-                                x:Name="Border"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="0">
-                                <Grid>
-                                    <!--  선택된 값 영역  -->
-                                    <ContentPresenter
-                                        Margin="5,0,0,0"
-                                        HorizontalAlignment="Left"
-                                        VerticalAlignment="Center"
-                                        Content="{TemplateBinding SelectionBoxItem}"
-                                        ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" />
-
-                                    <!--  드랍다운 버튼  -->
-                                    <ToggleButton
-                                        Background="Transparent"
-                                        BorderThickness="0"
-                                        Focusable="False"
-                                        IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
-                                        <Path
-                                            Width="10"
-                                            Height="6"
-                                            Margin="5"
-                                            Data="M 0 0 L 10 0 L 5 6 Z"
-                                            Fill="{StaticResource FontBrush}"
-                                            Stretch="Uniform" />
-                                    </ToggleButton>
-                                </Grid>
-                            </Border>
-
-                            <!--  드랍다운 팝업  -->
-                            <Popup
-                                x:Name="PART_Popup"
-                                AllowsTransparency="True"
-                                Focusable="False"
-                                IsOpen="{TemplateBinding IsDropDownOpen}"
-                                Placement="Bottom"
-                                PopupAnimation="Slide"
-                                StaysOpen="False">
-                                <Border
-                                    MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=ComboBox}}"
-                                    Background="{StaticResource GrayBrush3}"
-                                    BorderBrush="{StaticResource GrayBrush3}"
-                                    BorderThickness="1">
-                                    <ScrollViewer>
-                                        <ItemsPresenter />
-                                    </ScrollViewer>
-                                </Border>
-                            </Popup>
-                        </Grid>
-
-                        <!--  트리거 설정  -->
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Border" Property="Background" Value="{StaticResource SelectedBackgroundBrush}" />
-                            </Trigger>
-                            <Trigger Property="IsFocused" Value="True">
-                                <Setter TargetName="Border" Property="Background" Value="{StaticResource SelectedBackgroundBrush}" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style TargetType="ComboBoxItem">
-            <Setter Property="Background" Value="{StaticResource GrayBrush1}" />
-            <Setter Property="Foreground" Value="{StaticResource FontBrush}" />
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ComboBoxItem">
-                        <Border
-                            x:Name="Bd"
-                            Padding="{TemplateBinding Padding}"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="0">
-                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-                        </Border>
-
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsHighlighted" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource SelectedBackgroundBrush}" />
-                            </Trigger>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource SelectedBackgroundBrush}" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </UserControl.Resources>
-
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Orientation="Vertical">
             <TextBlock
@@ -188,30 +78,42 @@
                 Foreground="{StaticResource FontBrush}"
                 Text="{Binding Description}"
                 VerticalScrollBarVisibility="Auto" />
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Labels" />
 
             <!--  Labels  -->
-            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Labels" />
             <ComboBox
                 Margin="0,0,0,5"
+                Background="{StaticResource GrayBrush3}"
                 Foreground="{StaticResource FontBrush}"
                 IsEditable="True"
                 ItemsSource="{Binding Labels}"
                 SelectedItem="{Binding SelectedLabel}" />
 
-            <!--  Priority  -->
-            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Priority" />
-            <ComboBox
+            <!--  Parent Issue Key  -->
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Parent Issue Key" />
+            <TextBox
                 Margin="0,0,0,5"
+                Background="{StaticResource GrayBrush3}"
+                BorderThickness="0"
                 Foreground="{StaticResource FontBrush}"
-                IsEditable="True"
-                ItemsSource="{Binding Priorities}"
-                SelectedItem="{Binding SelectedPriority}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock FontWeight="Bold" Text="{Binding Name}" />
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
+                Text="{Binding ParentKey}" />
+
+            <!--  Worklog  -->
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Worklog (Time Spent e.g. 1h, 30m)" />
+            <TextBox
+                Margin="0,0,0,5"
+                Background="{StaticResource GrayBrush3}"
+                BorderThickness="0"
+                Foreground="{StaticResource FontBrush}"
+                Text="{Binding WorklogTimeSpent}" />
+
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Worklog Started (yyyy-MM-ddTHH:mm:ss)" />
+            <TextBox
+                Margin="0,0,0,5"
+                Background="{StaticResource GrayBrush3}"
+                BorderThickness="0"
+                Foreground="{StaticResource FontBrush}"
+                Text="{Binding WorklogStarted}" />
 
             <StackPanel>
                 <!--  Estimates  -->
@@ -270,16 +172,12 @@
                 <!--  Assignee  -->
                 <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Assignee" />
                 <ComboBox
+                    Margin="0,0,0,5"
+                    DisplayMemberPath="DisplayName"
                     Foreground="{StaticResource FontBrush}"
-                    IsEditable="True"
+                    IsEditable="False"
                     ItemsSource="{Binding Assignees}"
-                    SelectedItem="{Binding SelectedAssignee}">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock FontWeight="Bold" Text="{Binding DisplayName}" />
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
+                    SelectedItem="{Binding SelectedAssignee}" />
             </StackPanel>
 
             <!--  Submit  -->

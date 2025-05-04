@@ -51,8 +51,8 @@ namespace JiraClient.ViewModels
         private CreateFilterView mCreateFilterView;
         private CreateFilterVM mCreateFilterVM;
 
-        Dictionary<int, JiraIssue> mJiraIssuesByID;
-        Dictionary<string, List<int>> mJiraIssuesByJQL;
+        private Dictionary<int, JiraIssue> mJiraIssuesByID;
+        private Dictionary<string, List<int>> mJiraIssuesByJQL;
 
         bool mbInitialized = false;
         private DateTime mLastRefreshTime = DateTime.MinValue;
@@ -147,6 +147,8 @@ namespace JiraClient.ViewModels
         {
             mJiraIssuesByID = await JiraReadAPI.ReadAllJiraIssues();
             mJiraIssuesByJQL = await JiraReadAPI.ReadAllJiraIssuesByJQL();
+
+            mCreateIssueVM.ReadJiraIssueTypes(mJiraIssuesByID.Select(pair => pair.Value.Fields.Project.Key).Distinct().ToList());
 
             Stopwatch sw = Stopwatch.StartNew();
             foreach (KeyValuePair<int, JiraIssue> issueKeyToIssue in mJiraIssuesByID)

@@ -5,9 +5,81 @@ using Newtonsoft.Json;
 
 namespace JiraClient.JiraAPI
 {
+    public class CreateJiraIssueRequest
+    {
+        [JsonProperty("fields")]
+        public CreateJiraIssueFields Fields { get; set; }
+
+        [JsonProperty("update", NullValueHandling = NullValueHandling.Ignore)]
+        public CreateJiraIssueUpdate Update { get; set; }
+    }
+
+    public class CreateJiraIssueFields
+    {
+        [JsonProperty("project")]
+        public Project Project { get; set; } // 사용 시 key 또는 id 설정
+
+        [JsonProperty("issuetype")]
+        public IssueType IssueType { get; set; } // id 사용
+
+        [JsonProperty("summary")]
+        public string Summary { get; set; }
+
+        [JsonProperty("description")]
+        public string Description { get; set; }
+
+        [JsonProperty("labels", NullValueHandling = NullValueHandling.Ignore)]
+        public List<string> Labels { get; set; }
+
+        [JsonProperty("assignee", NullValueHandling = NullValueHandling.Ignore)]
+        public User Assignee { get; set; }
+
+        [JsonProperty("reporter", NullValueHandling = NullValueHandling.Ignore)]
+        public User Reporter { get; set; }
+
+        [JsonProperty("duedate", NullValueHandling = NullValueHandling.Ignore)]
+        public string DueDate { get; set; }
+
+        [JsonProperty("parent", NullValueHandling = NullValueHandling.Ignore)]
+        public JiraIssue Parent { get; set; } // parent는 key만 포함하면 됨
+
+        [JsonProperty("timetracking", NullValueHandling = NullValueHandling.Ignore)]
+        public JiraTimeTracking Timetracking { get; set; }
+    }
+
+    public class CreateJiraIssueUpdate
+    {
+        [JsonProperty("worklog")]
+        public List<JiraWorklogAdd> Worklog { get; set; }
+    }
+
+    public class JiraWorklogAdd
+    {
+        [JsonProperty("add")]
+        public JiraWorklogEntry Add { get; set; }
+    }
+
+    public class JiraWorklogEntry
+    {
+        [JsonProperty("started")]
+        public string Started { get; set; }
+
+        [JsonProperty("timeSpent")]
+        public string TimeSpent { get; set; }
+    }
+
+    public class JiraTimeTracking
+    {
+        [JsonProperty("originalEstimate")]
+        public string OriginalEstimate { get; set; }
+
+        [JsonProperty("remainingEstimate")]
+        public string RemainingEstimate { get; set; }
+    }
+
     public static class JiraCreateAPI
     {
-        public static async Task<(bool, JiraIssue)> CreateJiraIssueAsync(JiraIssue jiraIssue)
+        public static async Task<(bool, JiraIssue)> CreateJiraIssueAsync(CreateJiraIssueRequest jiraIssue)
         {
             string createIssueJson = JsonConvert.SerializeObject(jiraIssue);
 

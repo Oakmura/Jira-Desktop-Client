@@ -168,18 +168,73 @@ namespace JiraClient.JiraAPI
             }
         }
 
-        public static async Task<List<IssueType>> ReadIssueTypesAsync()
+        // TODO: change to appropriate place
+        public class CreateMetaResponse
+        {
+            [JsonProperty("projects")]
+            public List<ProjectWithIssueTypes> Projects { get; set; }
+        }
+
+        public class ProjectWithIssueTypes
+        {
+            [JsonProperty("key")]
+            public string Key { get; set; }
+
+            [JsonProperty("issuetypes")]
+            public List<IssueType> IssueTypes { get; set; }
+        }
+
+        public static async Task<Dictionary<string, List<IssueType>>> ReadIssueTypesAsync(List<string> projectKeys)
+        {
+            Dictionary<string, List<IssueType>> issueTypeMap = new Dictionary<string, List<IssueType>>();
+
+            if (projectKeys == null || projectKeys.Count == 0)
+            {
+                Logger.Log(MessageType.Warning, "Project key 리스트가 비어 있음");
+                return issueTypeMap;
+            }
+
+            using (HttpClient client = JiraCommonAPI.CreateHttpClient())
+            {
+                string joinedKeys = string.Join(",", projectKeys);
+                string url = $"{Settings.JiraBaseURL}/rest/api/2/issue/createmeta?projectKeys={joinedKeys}";
+
+                HttpResponseMessage response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+
+                string json = await response.Content.ReadAsStringAsync();
+                CreateMetaResponse createMeta = JsonConvert.DeserializeObject<CreateMetaResponse>(json);
+
+                if (createMeta?.Projects != null)
+                {
+                    foreach (ProjectWithIssueTypes project in createMeta.Projects)
+                    {
+                        if (!string.IsNullOrEmpty(project.Key) && project.IssueTypes != null)
+                        {
+                            issueTypeMap[project.Key] = project.IssueTypes;
+                            Logger.Log(MessageType.Info, $"이슈 타입 {project.IssueTypes.Count}개 가져옴 (Project: {project.Key})");
+                        }
+                    }
+                }
+            }
+
+            return issueTypeMap;
+        }
+
+        public static async Task<List<User>> ReadAssignableUsersAsync(string projectKey)
         {
             using (HttpClient client = JiraCommonAPI.CreateHttpClient())
             {
-                var response = await client.GetAsync($"{Settings.JiraBaseURL}/rest/api/latest/issuetype");
+                // DEFAULT project key로 C10을 사용
+                string finalProjectKey = string.IsNullOrWhiteSpace(projectKey) ? (Settings.DEFAULT_PROJECT_KEY ?? "C10") : projectKey;
+                HttpResponseMessage response = await client.GetAsync($"{Settings.JiraBaseURL}/rest/api/latest/user/assignable/search?project={finalProjectKey}");
                 response.EnsureSuccessStatusCode();
 
-                var json = await response.Content.ReadAsStringAsync();
-                var issueTypes = JsonConvert.DeserializeObject<List<IssueType>>(json);
+                string json = await response.Content.ReadAsStringAsync();
+                List<User> users = JsonConvert.DeserializeObject<List<User>>(json);
 
-                Logger.Log(MessageType.Info, $"이슈 타입 {issueTypes.Count}개 가져옴");
-                return issueTypes;
+                Logger.Log(MessageType.Info, $"Assignee {users.Count}명 가져옴 (Project: {finalProjectKey})");
+                return users;
             }
         }
 
@@ -197,39 +252,6 @@ namespace JiraClient.JiraAPI
 
                 Logger.Log(MessageType.Info, $"라벨 {labels.Count}개 가져옴");
                 return labels;
-            }
-        }
-
-        public static async Task<List<Priority>> ReadPrioritiesAsync()
-        {
-            using (HttpClient client = JiraCommonAPI.CreateHttpClient())
-            {
-                var response = await client.GetAsync($"{Settings.JiraBaseURL}/rest/api/latest/priority");
-                response.EnsureSuccessStatusCode();
-
-                var json = await response.Content.ReadAsStringAsync();
-                var priorities = JsonConvert.DeserializeObject<List<Priority>>(json);
-
-                Logger.Log(MessageType.Info, $"우선순위 {priorities.Count}개 가져옴");
-                return priorities;
-            }
-        }
-
-        public static async Task<List<User>> ReadAssignableUsersAsync()
-        {
-            using (HttpClient client = JiraCommonAPI.CreateHttpClient())
-            {
-                // DEFAULT project key로 C10을 사용
-                string projectKey = Settings.DEFAULT_PROJECT_KEY ?? "C10";
-
-                var response = await client.GetAsync($"{Settings.JiraBaseURL}/rest/api/latest/user/assignable/search?project={projectKey}");
-                response.EnsureSuccessStatusCode();
-
-                var json = await response.Content.ReadAsStringAsync();
-                var users = JsonConvert.DeserializeObject<List<User>>(json);
-
-                Logger.Log(MessageType.Info, $"Assignee {users.Count}명 가져옴");
-                return users;
             }
         }
     }
