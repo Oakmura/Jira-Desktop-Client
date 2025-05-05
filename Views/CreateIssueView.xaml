@@ -6,7 +6,7 @@
     xmlns:local="clr-namespace:JiraClient.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.modernwpf.com/2019"
-    d:DesignHeight="600"
+    d:DesignHeight="750"
     d:DesignWidth="800"
     mc:Ignorable="d">
 
