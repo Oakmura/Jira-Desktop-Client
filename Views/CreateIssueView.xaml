@@ -5,7 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:JiraClient.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="450"
+    d:DesignHeight="600"
     d:DesignWidth="800"
     mc:Ignorable="d">
 
@@ -22,7 +22,6 @@
             <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Project*" />
             <ComboBox
                 Margin="0,0,0,5"
-                Foreground="{StaticResource FontBrush}"
                 ItemsSource="{Binding Projects}"
                 SelectedItem="{Binding SelectedProject}">
                 <ComboBox.ItemTemplate>
@@ -40,7 +39,6 @@
             <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Issue Type*" />
             <ComboBox
                 Margin="0,0,0,5"
-                Foreground="{StaticResource FontBrush}"
                 ItemsSource="{Binding IssueTypes}"
                 SelectedItem="{Binding SelectedIssueType}">
                 <ComboBox.ItemTemplate>
@@ -58,8 +56,43 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
 
+            <!--  Parent Issue Key  -->
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Parent Issue Key" />
+            <ComboBox
+                x:Name="ParentIssueComboBox"
+                Margin="0,0,0,5"
+                ItemsSource="{Binding ParentIssueCandidates}"
+                SelectedItem="{Binding SelectedParentIssue}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock>
+                            <Run Text="{Binding Key}" />
+                            <Run Text=" - " />
+                            <Run Text="{Binding Fields.Summary}" />
+                        </TextBlock>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <!--  Labels  -->
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Labels" />
+            <ComboBox
+                Margin="0,0,0,5"
+                Background="{StaticResource GrayBrush3}"
+                ItemsSource="{Binding Labels}"
+                SelectedItem="{Binding SelectedLabel}" />
+
+            <!--  Assignee  -->
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Assignee" />
+            <ComboBox
+                Margin="0,0,0,5"
+                DisplayMemberPath="DisplayName"
+                IsEditable="False"
+                ItemsSource="{Binding Assignees}"
+                SelectedItem="{Binding SelectedAssignee}" />
+
             <!--  Summary  -->
-            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Summary" />
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Summary*" />
             <TextBox
                 Margin="0,0,0,5"
                 Background="{StaticResource GrayBrush3}"
@@ -78,25 +111,44 @@
                 Foreground="{StaticResource FontBrush}"
                 Text="{Binding Description}"
                 VerticalScrollBarVisibility="Auto" />
-            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Labels" />
 
-            <!--  Labels  -->
-            <ComboBox
-                Margin="0,0,0,5"
-                Background="{StaticResource GrayBrush3}"
-                Foreground="{StaticResource FontBrush}"
-                IsEditable="True"
-                ItemsSource="{Binding Labels}"
-                SelectedItem="{Binding SelectedLabel}" />
+            <StackPanel>
+                <!--  Start Date  -->
+                <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Start Date" />
+                <DatePicker
+                    Margin="0,0,0,5"
+                    BorderThickness="0"
+                    Foreground="{StaticResource DisabledFontBrush}"
+                    SelectedDate="{Binding StartDate}" />
 
-            <!--  Parent Issue Key  -->
-            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Parent Issue Key" />
-            <TextBox
-                Margin="0,0,0,5"
-                Background="{StaticResource GrayBrush3}"
-                BorderThickness="0"
-                Foreground="{StaticResource FontBrush}"
-                Text="{Binding ParentKey}" />
+                <!--  Due Date  -->
+                <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Due Date" />
+                <DatePicker
+                    Margin="0,0,0,5"
+                    BorderThickness="0"
+                    Foreground="{StaticResource DisabledFontBrush}"
+                    SelectedDate="{Binding DueDate}" />
+            </StackPanel>
+
+            <!--  Estimates  -->
+            <StackPanel Margin="0,0,0,5" Orientation="Horizontal">
+                <StackPanel Margin="0,0,10,0">
+                    <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Original Estimate (e.g. 1d 2h 30m)" />
+                    <TextBox
+                        Background="{StaticResource GrayBrush3}"
+                        BorderThickness="0"
+                        Foreground="{StaticResource FontBrush}"
+                        Text="{Binding OriginalEstimate}" />
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Remaining Estimate" />
+                    <TextBox
+                        Background="{StaticResource GrayBrush3}"
+                        BorderThickness="0"
+                        Foreground="{StaticResource FontBrush}"
+                        Text="{Binding RemainingEstimate}" />
+                </StackPanel>
+            </StackPanel>
 
             <!--  Worklog  -->
             <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Worklog (Time Spent e.g. 1h, 30m)" />
@@ -114,71 +166,6 @@
                 BorderThickness="0"
                 Foreground="{StaticResource FontBrush}"
                 Text="{Binding WorklogStarted}" />
-
-            <StackPanel>
-                <!--  Estimates  -->
-                <StackPanel Margin="0,0,0,5" Orientation="Horizontal">
-                    <StackPanel Margin="0,0,10,0">
-                        <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Original Estimate" />
-                        <TextBox
-                            Background="{StaticResource GrayBrush3}"
-                            BorderThickness="0"
-                            Foreground="{StaticResource FontBrush}"
-                            Text="{Binding OriginalEstimate}" />
-                    </StackPanel>
-                    <StackPanel>
-                        <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Remaining Estimate" />
-                        <TextBox
-                            Background="{StaticResource GrayBrush3}"
-                            BorderThickness="0"
-                            Foreground="{StaticResource FontBrush}"
-                            Text="{Binding RemainingEstimate}" />
-                    </StackPanel>
-                </StackPanel>
-
-                <!--  Start Date  -->
-                <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Start Date" />
-                <DatePicker
-                    Margin="0,0,0,5"
-                    BorderThickness="0"
-                    Foreground="{StaticResource DisabledFontBrush}"
-                    SelectedDate="{Binding StartDate}" />
-
-                <!--  Attachment  -->
-                <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Attachment" />
-                <Border
-                    Margin="0,0,0,5"
-                    Padding="20"
-                    HorizontalAlignment="Stretch"
-                    Background="{StaticResource GrayBrush3}"
-                    BorderBrush="Gray"
-                    BorderThickness="0">
-                    <TextBlock
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Style="{StaticResource LightTextBlockStyle}"
-                        Text="Drop files or click to browse" />
-                    <!--  Drag & Drop 파일 처리는 코드비하인드에서  -->
-                </Border>
-
-                <!--  Due Date  -->
-                <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Due Date" />
-                <DatePicker
-                    Margin="0,0,0,5"
-                    BorderThickness="0"
-                    Foreground="{StaticResource DisabledFontBrush}"
-                    SelectedDate="{Binding DueDate}" />
-
-                <!--  Assignee  -->
-                <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Assignee" />
-                <ComboBox
-                    Margin="0,0,0,5"
-                    DisplayMemberPath="DisplayName"
-                    Foreground="{StaticResource FontBrush}"
-                    IsEditable="False"
-                    ItemsSource="{Binding Assignees}"
-                    SelectedItem="{Binding SelectedAssignee}" />
-            </StackPanel>
 
             <!--  Submit  -->
             <Button

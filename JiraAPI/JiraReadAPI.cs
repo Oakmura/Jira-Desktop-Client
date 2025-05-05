@@ -10,9 +10,31 @@ namespace JiraClient.JiraAPI
 {
     public static class JiraReadAPI
     {
-        public static async Task<Dictionary<int, JiraIssue>> ReadAllJiraIssues()
+        public static async Task<JiraIssue> ReadSingleJiraIssueOrNull(string jiraIssueKey)
         {
-            Dictionary<int, JiraIssue> jiraIssues = new Dictionary<int, JiraIssue>(4096);
+            using (HttpClient client = JiraCommonAPI.CreateHttpClient())
+            {
+                HttpResponseMessage response = await client.GetAsync($"{Settings.JiraBaseURL}/rest/api/2/issue/{jiraIssueKey}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string content = await response.Content.ReadAsStringAsync();
+                    JiraIssue issue = JsonConvert.DeserializeObject<JiraIssue>(content);
+                    Logger.Log(MessageType.Info, $"이슈 조회 성공: {jiraIssueKey}");
+                    return issue;
+                }
+                else
+                {
+                    string content = await response.Content.ReadAsStringAsync();
+                    Logger.Log(MessageType.Error, $"이슈 조회 실패: {response.StatusCode} - {content}");
+                    return null;
+                }
+            }
+        }
+
+        public static async Task<Dictionary<string, JiraIssue>> ReadAllJiraIssues()
+        {
+            Dictionary<string, JiraIssue> jiraIssues = new Dictionary<string, JiraIssue>(4096);
             int maxResults = 100;
             int total = 0;
 
@@ -26,8 +48,8 @@ namespace JiraClient.JiraAPI
                 Stopwatch swFetchOne = Stopwatch.StartNew();
                 Stopwatch swFetchAll = Stopwatch.StartNew();
 
-                string firstUrl = $"/rest/api/latest/search?startAt=0&maxResults=1";
-                HttpResponseMessage firstResponse = await client.GetAsync(firstUrl);
+                string firstURL = $"/rest/api/latest/search?startAt=0&maxResults=1";
+                HttpResponseMessage firstResponse = await client.GetAsync(firstURL);
                 firstResponse.EnsureSuccessStatusCode();
 
                 string firstContent = await firstResponse.Content.ReadAsStringAsync();
@@ -73,8 +95,37 @@ namespace JiraClient.JiraAPI
             }
         }
 
+        public static async Task<List<string>> ReadAllJiraIssuesByJQL(string JQL)
+        {
+            List<string> issueIDs = new List<string>();
+
+            using (HttpClient client = JiraCommonAPI.CreateHttpClient())
+            {
+                string apiURL = $"{Settings.JiraBaseURL}/rest/api/2/search?jql={Uri.EscapeDataString(JQL)}&maxResults=100&fields=id";
+
+                HttpResponseMessage response = await client.GetAsync(apiURL);
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    JiraResponseAPI jiraResponse = JsonConvert.DeserializeObject<JiraResponseAPI>(result);
+
+                    foreach (JiraIssue issue in jiraResponse.Issues)
+                    {
+                        issueIDs.Add(issue.ID);
+                    }
+                }
+                else
+                {
+                    Logger.Log(MessageType.Error, $"[ReadAllJiraIssuesByJQL] {response.StatusCode} - {response.ReasonPhrase}");
+                }
+            }
+
+            return issueIDs;
+        }
+
+
         // <JQL, [issue keys]>
-        public static async Task<Dictionary<string, List<int>>> ReadAllJiraIssuesByJQL()
+        public static async Task<Dictionary<string, List<string>>> ReadAllJiraIssuesByJQL()
         {
             string[] JQLs;
             try
@@ -93,7 +144,7 @@ namespace JiraClient.JiraAPI
                 return null;
             }
 
-            Dictionary<string, List<int>> issueKeysByJQL = new Dictionary<string, List<int>>(128);
+            Dictionary<string, List<string>> issueKeysByJQL = new Dictionary<string, List<string>>(128);
             using (HttpClient client = JiraCommonAPI.CreateHttpClient())
             {
                 client.BaseAddress = new Uri(Settings.JiraBaseURL);
@@ -134,7 +185,7 @@ namespace JiraClient.JiraAPI
                         {
                             if (!issueKeysByJQL.ContainsKey(filterName))
                             {
-                                issueKeysByJQL[filterName] = new List<int>(1024);
+                                issueKeysByJQL[filterName] = new List<string>(1024);
                             }
 
                             issueKeysByJQL[filterName].Add(jiraIssue.ID);
@@ -184,7 +235,7 @@ namespace JiraClient.JiraAPI
             public List<IssueType> IssueTypes { get; set; }
         }
 
-        public static async Task<Dictionary<string, List<IssueType>>> ReadIssueTypesAsync(List<string> projectKeys)
+        public static async Task<Dictionary<string, List<IssueType>>> ReadIssueTypesByProjectAsync(List<string> projectKeys)
         {
             Dictionary<string, List<IssueType>> issueTypeMap = new Dictionary<string, List<IssueType>>();
 

@@ -44,11 +44,16 @@
 
             <!--  Filter List  -->
             <ListBox
+                x:Name="FilterListBox"
                 Grid.Column="0"
                 Margin="0,0,10,0"
+                AllowDrop="True"
                 DisplayMemberPath="FilterName"
+                Drop="FilterListBox_Drop"
                 FontSize="14"
                 ItemsSource="{Binding JqlFilters}"
+                MouseMove="FilterListBox_MouseMove"
+                PreviewMouseLeftButtonDown="FilterListBox_PreviewMouseLeftButtonDown"
                 SelectedItem="{Binding SelectedFilter, Mode=TwoWay}" />
 
             <GridSplitter

@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using System.Net.Mail;
 using System.Text;
 using JiraClient.Utilities;
 using Newtonsoft.Json;
@@ -34,8 +35,8 @@ namespace JiraClient.JiraAPI
         [JsonProperty("assignee", NullValueHandling = NullValueHandling.Ignore)]
         public User Assignee { get; set; }
 
-        [JsonProperty("reporter", NullValueHandling = NullValueHandling.Ignore)]
-        public User Reporter { get; set; }
+        [JsonProperty("customfield_10015", NullValueHandling = NullValueHandling.Ignore)]
+        public string StartDate { get; set; }  // Format: "yyyy-MM-dd"
 
         [JsonProperty("duedate", NullValueHandling = NullValueHandling.Ignore)]
         public string DueDate { get; set; }

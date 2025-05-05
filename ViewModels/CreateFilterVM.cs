@@ -1,6 +1,8 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using JiraClient.Common;
 using JiraClient.Utilities;
 
@@ -21,6 +23,7 @@ namespace JiraClient.ViewModels
                 }
             }
         }
+
         private string mFilterJQL;
         public string FilterJQL
         {
@@ -34,6 +37,7 @@ namespace JiraClient.ViewModels
                 }
             }
         }
+
         public FilterVM(string filterName, string filterJQL)
         {
             FilterName = filterName;
@@ -116,7 +120,7 @@ namespace JiraClient.ViewModels
             UpdateFilterCommand = new RelayCommand(onUpdateFilterCommand);
             DeleteFilterCommand = new RelayCommand(onDeleteFilterCommand);
 
-            loadAllJiraIssues();
+            loadAllJiraFilters();
         }
 
         public void OnRefreshCommand()
@@ -156,6 +160,15 @@ namespace JiraClient.ViewModels
                 {
                     writer.WriteLine($"{NewFilterName},{NewFilterJQL}");
                 }
+
+                MainWindowVM mainWindowVM = Application.Current.MainWindow.DataContext as MainWindowVM;
+                if (mainWindowVM == null)
+                {
+                    Logger.Log(MessageType.Warning, "MainWindowVM을 찾을 수 없습니다.");
+                    return;
+                }
+
+                mainWindowVM.OnNewFilterCreated(newFilter);
             }
             catch (Exception e)
             {
@@ -178,15 +191,19 @@ namespace JiraClient.ViewModels
             mFilterJqlSet.Remove(previousFilterJQL);
             mFilterJqlSet.Add(NewFilterJQL);
 
+            FilterVM filterToUpdate = null;
             for (int i = 0; i < JqlFilters.Count; ++i)
             {
                 if (JqlFilters[i].FilterName.Equals(previousFilterName) && JqlFilters[i].FilterJQL.Equals(previousFilterJQL))
                 {
                     JqlFilters[i].FilterName = NewFilterName;
                     JqlFilters[i].FilterJQL = NewFilterJQL;
+                    filterToUpdate = JqlFilters[i];
+
                     break;
                 }
             }
+            Debug.Assert(filterToUpdate != null, "Filter to update is null");
 
             try
             {
@@ -214,6 +231,15 @@ namespace JiraClient.ViewModels
                 }
 
                 File.WriteAllLines(USER_JQL_PATH, JQLs);
+
+                MainWindowVM mainWindowVM = Application.Current.MainWindow.DataContext as MainWindowVM;
+                if (mainWindowVM == null)
+                {
+                    Logger.Log(MessageType.Warning, "MainWindowVM을 찾을 수 없습니다.");
+                    return;
+                }
+
+                mainWindowVM.OnFilterUpdated(previousFilterName, filterToUpdate);
             }
             catch (Exception e)
             {
@@ -247,6 +273,15 @@ namespace JiraClient.ViewModels
                 var updatedLines = JQLs.Where(line => !line.Trim().Equals(targetLine)).ToArray();
 
                 File.WriteAllLines(USER_JQL_PATH, updatedLines);
+
+                MainWindowVM mainWindowVM = Application.Current.MainWindow.DataContext as MainWindowVM;
+                if (mainWindowVM == null)
+                {
+                    Logger.Log(MessageType.Warning, "MainWindowVM을 찾을 수 없습니다.");
+                    return;
+                }
+
+                mainWindowVM.OnFilterDeleted(filterToDelete);
             }
             catch (Exception e)
             {
@@ -255,7 +290,7 @@ namespace JiraClient.ViewModels
             }
         }
 
-        private void loadAllJiraIssues()
+        private void loadAllJiraFilters()
         {
             string[] JQLs;
 
@@ -288,6 +323,32 @@ namespace JiraClient.ViewModels
             {
                 Logger.Log(MessageType.Error, e.Message);
                 return;
+            }
+        }
+
+        public void SaveCurrentFilterOrderToDisk()
+        {
+            try
+            {
+                if (!Path.Exists(USER_JQL_PATH))
+                {
+                    Logger.Log(MessageType.Error, $"User JQL Path: {USER_JQL_PATH} does not exist");
+                    return;
+                }
+
+                using (StreamWriter writer = new StreamWriter(USER_JQL_PATH, false)) // 덮어쓰기 모드
+                {
+                    foreach (var filter in JqlFilters)
+                    {
+                        writer.WriteLine($"{filter.FilterName},{filter.FilterJQL}");
+                    }
+                }
+
+                Logger.Log(MessageType.Info, $"SaveCurrentFilterOrderToDisk: {JqlFilters.Count} filters 저장 완료");
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(MessageType.Error, $"SaveCurrentFilterOrderToDisk 실패: {ex.Message}");
             }
         }
     }

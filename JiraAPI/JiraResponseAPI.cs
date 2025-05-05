@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.ObjectModel;
+using Newtonsoft.Json;
 
 namespace JiraClient.JiraAPI
 {
@@ -22,7 +23,7 @@ namespace JiraClient.JiraAPI
     public class JiraIssue
     {
         [JsonProperty("id")]
-        public int ID { get; set; } // "id": "13688"
+        public string ID { get; set; } // "id": "13688"
 
         [JsonProperty("key")]
         public string Key { get; set; } // "key": "VFS-36"
@@ -36,8 +37,11 @@ namespace JiraClient.JiraAPI
         [JsonProperty("parent")]
         public JiraIssue Parent { get; set; }
 
+        // [JsonProperty("subtasks")]
+        // public List<JiraIssue> SubTasks { get; set; }
+
         [JsonProperty("subtasks")]
-        public List<JiraIssue> SubTasks { get; set; }
+        public ObservableCollection<JiraIssue> SubTasks { get; set; }
 
         [JsonProperty("summary")]
         public string Summary { get; set; } // "ChatGPT 온라인 강의 및 전파교육"

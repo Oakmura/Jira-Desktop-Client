@@ -41,6 +41,11 @@ namespace JiraClient.ViewModels
                 {
                     mSelectedIssueType = value;
                     OnPropertyChanged();
+
+                    if (mSelectedIssueType != null)
+                    {
+                        updateParentIssueCandidates(mSelectedIssueType.Name);
+                    }
                 }
             }
         }
@@ -131,7 +136,7 @@ namespace JiraClient.ViewModels
             }
         }
 
-        private DateTime mStartDate;
+        private DateTime mStartDate = DateTime.Now;
         public DateTime StartDate
         {
             get => mStartDate;
@@ -159,19 +164,21 @@ namespace JiraClient.ViewModels
             }
         }
 
-        private string mParentKey;
-        public string ParentKey
+        public ObservableCollection<JiraIssue> ParentIssueCandidates { get; } = new();
+        private JiraIssue mSelectedParentIssue;
+        public JiraIssue SelectedParentIssue
         {
-            get => mParentKey;
+            get => mSelectedParentIssue;
             set
             {
-                if (mParentKey != value)
+                if (mSelectedParentIssue != value)
                 {
-                    mParentKey = value;
+                    mSelectedParentIssue = value;
                     OnPropertyChanged();
                 }
             }
         }
+
 
         private string mWorklogTimeSpent;
         public string WorklogTimeSpent
@@ -215,9 +222,9 @@ namespace JiraClient.ViewModels
             Logger.Log(MessageType.Info, "Refreshing CreateIssue ViewModel");
         }
 
-        public async void ReadJiraIssueTypes(List<string> uniqueProjectKeys)
+        public async void ReadJiraIssueTypesByProject(List<string> uniqueProjectKeys)
         {
-            mJiraIssueTypeByProject = await JiraReadAPI.ReadIssueTypesAsync(uniqueProjectKeys);
+            mJiraIssueTypeByProject = await JiraReadAPI.ReadIssueTypesByProjectAsync(uniqueProjectKeys);
 
             updateIssueTypes();
         }
@@ -275,13 +282,15 @@ namespace JiraClient.ViewModels
                 {
                     Fields = new CreateJiraIssueFields
                     {
-                        Project = new Project { Key = SelectedProject.Key },
+                        Project = new Project { ID = SelectedProject.ID },
                         IssueType = new IssueType { ID = SelectedIssueType.ID },
                         Summary = Summary,
                         Description = Description,
                         Labels = !string.IsNullOrWhiteSpace(SelectedLabel) ? new List<string> { SelectedLabel } : null,
                         Assignee = SelectedAssignee != null ? new User { AccountID = SelectedAssignee.AccountID } : null,
+                        StartDate = StartDate.ToString("yyyy-MM-dd"),
                         DueDate = DueDate?.ToString("yyyy-MM-dd"),
+
                         Timetracking = (!string.IsNullOrWhiteSpace(OriginalEstimate) || !string.IsNullOrWhiteSpace(RemainingEstimate))
                             ? new JiraTimeTracking
                             {
@@ -289,7 +298,9 @@ namespace JiraClient.ViewModels
                                 RemainingEstimate = RemainingEstimate
                             }
                             : null,
-                        Parent = !string.IsNullOrWhiteSpace(ParentKey) ? new JiraIssue { Key = ParentKey } : null
+                        Parent = SelectedParentIssue != null && !string.IsNullOrWhiteSpace(SelectedParentIssue.Key) 
+                            ? new JiraIssue { Key = SelectedParentIssue.Key } 
+                            : null
                     },
 
                     Update = (!string.IsNullOrWhiteSpace(WorklogTimeSpent) && !string.IsNullOrWhiteSpace(WorklogStarted))
@@ -315,6 +326,15 @@ namespace JiraClient.ViewModels
                 {
                     Logger.Log(MessageType.Info, $"이슈 생성 성공: {createdIssue.Key}");
                     resetFields();
+
+                    MainWindowVM mainWindowVM = Application.Current.MainWindow.DataContext as MainWindowVM;
+                    if (mainWindowVM == null)
+                    {
+                        Logger.Log(MessageType.Warning, "MainWindowVM을 찾을 수 없습니다.");
+                        return;
+                    }
+
+                    mainWindowVM.OnNewIssueCreated(createdIssue.Key);
                 }
                 else
                 {
@@ -367,18 +387,83 @@ namespace JiraClient.ViewModels
             });
         }
 
+        private void updateParentIssueCandidates(string issueType)
+        {
+            ParentIssueCandidates.Clear();
+
+            if (SelectedProject == null || string.IsNullOrWhiteSpace(SelectedProject.Key))
+            {
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(issueType))
+            {
+                return;
+            }
+
+            MainWindowVM mainWindowVM = Application.Current.MainWindow.DataContext as MainWindowVM;
+            if (mainWindowVM == null)
+            {
+                Logger.Log(MessageType.Warning, "MainWindowVM을 찾을 수 없습니다.");
+                return;
+            }
+
+            Dictionary<string, JiraIssue> allIssues = mainWindowVM.mJiraIssuesByID;
+
+            string lowerIssueType = issueType.ToLowerInvariant();
+            List<JiraIssue> candidates = new List<JiraIssue>();
+
+            if (lowerIssueType == "sub-task")
+            {
+                foreach (KeyValuePair<string, JiraIssue> pair in allIssues)
+                {
+                    JiraIssue issue = pair.Value;
+                    JiraIssueFields issueFields = issue.Fields;
+
+                    bool sameProject = issueFields.Project.Key == SelectedProject.Key;
+                    bool notEpic = !string.Equals(issueFields.IssueType.Name, "epic", StringComparison.OrdinalIgnoreCase);
+                    bool notSubtask = !string.Equals(issueFields.IssueType.Name, "sub-task", StringComparison.OrdinalIgnoreCase);
+
+                    if (sameProject && notEpic && notSubtask)
+                    {
+                        candidates.Add(issue);
+                    }
+                }
+            }
+            else if (lowerIssueType != "epic")
+            {
+                foreach (KeyValuePair<string, JiraIssue> pair in allIssues)
+                {
+                    JiraIssue issue = pair.Value;
+                    JiraIssueFields issueFields = issue.Fields;
+
+                    if (issueFields.Project.Key == SelectedProject.Key &&
+                        string.Equals(issueFields.IssueType.Name, "epic", StringComparison.OrdinalIgnoreCase))
+                    {
+                        candidates.Add(issue);
+                    }
+                }
+            }
+
+            foreach (JiraIssue issue in candidates)
+            {
+                ParentIssueCandidates.Add(issue);
+            }
+        }
+
         private void resetFields()
         {
+            SelectedProject = null;
             SelectedIssueType = null;
-            Summary = string.Empty;
-            Description = string.Empty;
+            SelectedParentIssue = null;
             SelectedLabel = null;
             SelectedAssignee = null;
+            Summary = string.Empty;
+            Description = string.Empty;
             OriginalEstimate = string.Empty;
             RemainingEstimate = string.Empty;
             StartDate = DateTime.Now;
             DueDate = null;
-            ParentKey = string.Empty;
             WorklogTimeSpent = string.Empty;
             WorklogStarted = string.Empty;
         }

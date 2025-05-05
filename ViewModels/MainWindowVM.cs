@@ -5,6 +5,8 @@ using System.Diagnostics;
 using System.Windows.Controls;
 using System.Windows.Input;
 using JiraClient.JiraAPI;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace JiraClient.ViewModels
 {
@@ -27,6 +29,7 @@ namespace JiraClient.ViewModels
             }
         }
 
+        private IssueListVM mIssueListVM;
         private UserControl mIssueListView;
         public UserControl IssueListView
         {
@@ -40,23 +43,21 @@ namespace JiraClient.ViewModels
                 }
             }
         }
-        private IssueListVM mIssueListVM;
 
-        private ViewIssueView mViewIssueView;
         private ViewIssueVM mViewIssueVM;
-
-        private CreateIssueView mCreateIssueView;
+        private ViewIssueView mViewIssueView;
         private CreateIssueVM mCreateIssueVM;
-
-        private CreateFilterView mCreateFilterView;
+        private CreateIssueView mCreateIssueView;
         private CreateFilterVM mCreateFilterVM;
+        private CreateFilterView mCreateFilterView;
 
-        private Dictionary<int, JiraIssue> mJiraIssuesByID;
-        private Dictionary<string, List<int>> mJiraIssuesByJQL;
+        // TODO: should keep this to private
+        public Dictionary<string, JiraIssue> mJiraIssuesByID { get; set; }
+        private Dictionary<string, List<string>> mJiraIssuesByJQL;
 
         bool mbInitialized = false;
         private DateTime mLastRefreshTime = DateTime.MinValue;
-        private static readonly double REFRESH_INTERVAL_SECONDS = 10;
+        private static readonly double REFRESH_INTERVAL_IN_SECONDS = 10;
 
         public MainWindowVM()
         {
@@ -65,20 +66,20 @@ namespace JiraClient.ViewModels
             RefreshCommand = new RelayCommand(OnRefreshCommand);
             SwitchViewCommand = new RelayCommand<string>(OnSwitchViewCommand);
 
-            mIssueListView = new IssueListView();
             mIssueListVM = new IssueListVM();
+            mIssueListView = new IssueListView();
             mIssueListView.DataContext = mIssueListVM;
 
-            mViewIssueView = new ViewIssueView();
             mViewIssueVM = new ViewIssueVM();
+            mViewIssueView = new ViewIssueView();
             mViewIssueView.DataContext = mViewIssueVM;
 
-            mCreateFilterView = new CreateFilterView();
             mCreateFilterVM = new CreateFilterVM();
+            mCreateFilterView = new CreateFilterView();
             mCreateFilterView.DataContext = mCreateFilterVM;
 
-            mCreateIssueView = new CreateIssueView();
             mCreateIssueVM = new CreateIssueVM();
+            mCreateIssueView = new CreateIssueView();
             mCreateIssueView.DataContext = mCreateIssueVM;
 
             CurrentView = mViewIssueView;
@@ -96,9 +97,9 @@ namespace JiraClient.ViewModels
             DateTime now = DateTime.Now;
             double secondsSinceLastRefresh = (now - mLastRefreshTime).TotalSeconds;
 
-            if (secondsSinceLastRefresh < REFRESH_INTERVAL_SECONDS)
+            if (secondsSinceLastRefresh < REFRESH_INTERVAL_IN_SECONDS)
             {
-                Logger.Log(MessageType.Info, $"Refresh skipped. Only {secondsSinceLastRefresh:F1}/{REFRESH_INTERVAL_SECONDS:F1} seconds since last refresh.");
+                Logger.Log(MessageType.Info, $"Refresh skipped. Only {secondsSinceLastRefresh:F1}/{REFRESH_INTERVAL_IN_SECONDS:F1} seconds since last refresh.");
                 return;
             }
 
@@ -113,7 +114,55 @@ namespace JiraClient.ViewModels
 
         public void OnSelectedIssueChanged(JiraIssue jiraIssue)
         {
-            mViewIssueVM.OnSelectedIssueChanged(jiraIssue);     
+            mViewIssueVM.OnSelectedIssueChanged(jiraIssue);
+        }
+
+        public async void OnNewIssueCreated(string jiraIssueKey)
+        {
+            JiraIssue jiraIssue = await JiraReadAPI.ReadSingleJiraIssueOrNull(jiraIssueKey);
+            Debug.Assert(jiraIssue != null, "JiraIssue is null");
+
+            mJiraIssuesByID[jiraIssue.ID] = jiraIssue;
+            _ = RefreshCreate(jiraIssue);
+        }
+
+        public void OnIssueDeleted(JiraIssue jiraIssue)
+        {
+            mJiraIssuesByID.Remove(jiraIssue.ID);
+            _ = refreshDelete(jiraIssue);
+        }
+
+        public async void OnNewFilterCreated(FilterVM newFilter)
+        {
+            List<string> filteredJiraIssues = await JiraReadAPI.ReadAllJiraIssuesByJQL(newFilter.FilterJQL);
+            mJiraIssuesByJQL[newFilter.FilterName] = filteredJiraIssues;
+            mIssueListVM.OnNewFilterCreated(newFilter, filteredJiraIssues, mJiraIssuesByID);
+        }
+
+        public void OnFilterDeleted(FilterVM filterToDelete)
+        {
+            if (mJiraIssuesByJQL.ContainsKey(filterToDelete.FilterName))
+            {
+                mJiraIssuesByJQL.Remove(filterToDelete.FilterName);
+                mIssueListVM.OnFilterDeleted(filterToDelete);
+            }
+        }
+
+        public async void OnFilterUpdated(string previousFilterName, FilterVM filterToUpdate)
+        {
+            if (mJiraIssuesByJQL.ContainsKey(previousFilterName))
+            {
+                mJiraIssuesByJQL.Remove(previousFilterName);
+                List<string> filteredJiraIssues = await JiraReadAPI.ReadAllJiraIssuesByJQL(filterToUpdate.FilterJQL);
+                mJiraIssuesByJQL[filterToUpdate.FilterName] = filteredJiraIssues;
+                mIssueListVM.OnFilterUpdated(previousFilterName, filterToUpdate, filteredJiraIssues, mJiraIssuesByID);
+            }
+        }
+
+        public void OnFilterOrderChanged(int oldIndex, int newIndex)
+        {
+            mIssueListVM.OnFilterOrderChanged(oldIndex, newIndex);
+            mCreateFilterVM.SaveCurrentFilterOrderToDisk();
         }
 
         public void SwitchToIssueDetailView(JiraIssue jiraIssue)
@@ -148,10 +197,10 @@ namespace JiraClient.ViewModels
             mJiraIssuesByID = await JiraReadAPI.ReadAllJiraIssues();
             mJiraIssuesByJQL = await JiraReadAPI.ReadAllJiraIssuesByJQL();
 
-            mCreateIssueVM.ReadJiraIssueTypes(mJiraIssuesByID.Select(pair => pair.Value.Fields.Project.Key).Distinct().ToList());
+            mCreateIssueVM.ReadJiraIssueTypesByProject(mJiraIssuesByID.Select(pair => pair.Value.Fields.Project.Key).Distinct().ToList());
 
             Stopwatch sw = Stopwatch.StartNew();
-            foreach (KeyValuePair<int, JiraIssue> issueKeyToIssue in mJiraIssuesByID)
+            foreach (KeyValuePair<string, JiraIssue> issueKeyToIssue in mJiraIssuesByID)
             {
                 // if jira issue has parent, add itself as subtask to parent
                 if (issueKeyToIssue.Value.Fields.Parent != null)
@@ -161,7 +210,7 @@ namespace JiraClient.ViewModels
    
                     if (parent.Fields.SubTasks == null)
                     {
-                        parent.Fields.SubTasks = new List<JiraIssue>(128);
+                        parent.Fields.SubTasks = new ObservableCollection<JiraIssue>();
                     }
 
                     // 이미 subtask에 추가된 경우 overwrite
@@ -197,6 +246,71 @@ namespace JiraClient.ViewModels
             mIssueListVM.Setup(mJiraIssuesByID, mJiraIssuesByJQL);
 
             mbInitialized = true;
+        }
+
+        private async Task RefreshCreate(JiraIssue jiraIssue)
+        {
+            mJiraIssuesByJQL = await JiraReadAPI.ReadAllJiraIssuesByJQL();
+
+            Stopwatch sw = Stopwatch.StartNew();
+
+            // if jira issue has parent, add itself as subtask to parent
+            if (jiraIssue.Fields.Parent != null)
+            {
+                JiraIssue parent = mJiraIssuesByID[jiraIssue.Fields.Parent.ID];
+                jiraIssue.Fields.Parent = parent;
+
+                if (parent.Fields.SubTasks == null)
+                {
+                    parent.Fields.SubTasks = new ObservableCollection<JiraIssue>();
+                }
+
+                // 이미 subtask에 추가된 경우 overwrite
+                bool bFound = false;
+                for (int i = 0; i < parent.Fields.SubTasks.Count; ++i)
+                {
+                    if (parent.Fields.SubTasks[i].ID == jiraIssue.ID)
+                    {
+                        parent.Fields.SubTasks[i] = jiraIssue;
+                        bFound = true;
+                        break;
+                    }
+                }
+
+                if (!bFound)
+                {
+                    parent.Fields.SubTasks.Add(jiraIssue);
+                }
+            }
+
+            // if jira issue has subtasks, add them to parent
+            if (jiraIssue.Fields.SubTasks != null)
+            {
+                foreach (JiraIssue subtask in jiraIssue.Fields.SubTasks)
+                {
+                    subtask.Fields.Parent = jiraIssue;
+                }
+            }
+            sw.Stop();
+            Logger.Log(MessageType.Info, $"Parsing took {sw.Elapsed} seconds");
+
+            mIssueListVM.OnNewIssueCreated(jiraIssue, mJiraIssuesByID, mJiraIssuesByJQL);
+        }
+
+        private async Task refreshDelete(JiraIssue jiraIssue)
+        {
+            mJiraIssuesByJQL = await JiraReadAPI.ReadAllJiraIssuesByJQL();
+
+            Stopwatch sw = Stopwatch.StartNew();
+            if (jiraIssue.Fields.Parent != null)
+            {
+                JiraIssue parent = mJiraIssuesByID[jiraIssue.Fields.Parent.ID];
+                parent.Fields.SubTasks.Remove(jiraIssue);
+            }
+            sw.Stop();
+            Logger.Log(MessageType.Info, $"Refresh Delete took {sw.Elapsed} seconds");
+
+            mIssueListVM.OnIssueDeleted(jiraIssue, mJiraIssuesByID, mJiraIssuesByJQL);
         }
     }
 }

@@ -49,14 +49,25 @@ namespace JiraClient.Views
             }
         }
 
-        private void DeleteIssueButtonClick(object sender, RoutedEventArgs e)
+        private async void DeleteIssueButtonClick(object sender, RoutedEventArgs e)
         {
             if (sender is MenuItem menuItem &&
                 menuItem.Parent is ContextMenu contextMenu &&
                 contextMenu.PlacementTarget is FrameworkElement fe &&
                 fe.DataContext is JiraIssue selectedIssue)
             {
-                Logger.Log(MessageType.Warning, $"Delete issue: {selectedIssue.Key} (Not implemented yet)");
+                if (selectedIssue.Fields.SubTasks.Count != 0)
+                {
+                    Logger.Log(MessageType.Error, "Child Issue가 있는 이슈는 제거할 수 없습니다. 먼저 Child Issue 들을 모두 제거해주세요.");
+                    return;
+                }
+
+                bool bSuccess = await JiraDeleteAPI.DeleteIssueAsync(selectedIssue.Key);
+
+                var mainWindow = Application.Current.MainWindow as MainWindow;
+                var mainWindowVM = mainWindow.DataContext as MainWindowVM;
+
+                mainWindowVM.OnIssueDeleted(selectedIssue);
             }
         }
     }
