@@ -27,9 +27,9 @@
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock FontWeight="Bold" Text="{Binding Key}" />
-                            <TextBlock Text=" - " />
-                            <TextBlock Text="{Binding Name}" />
+                            <TextBlock Foreground="{StaticResource FontBrush}" Text="{Binding Key}" />
+                            <TextBlock Foreground="{StaticResource FontBrush}" Text=" - " />
+                            <TextBlock Foreground="{StaticResource FontBrush}" Text="{Binding Name}" />
                         </StackPanel>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
@@ -44,13 +44,7 @@
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
-                            <!--TODO
-                            <Image
-                                Width="16"
-                                Height="16"
-                                Margin="0,0,5,0"
-                                Source="{Binding IconImage}" />-->
-                            <TextBlock Text="{Binding Name}" />
+                            <TextBlock Foreground="{StaticResource FontBrush}" Text="{Binding Name}" />
                         </StackPanel>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
@@ -66,9 +60,9 @@
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock>
-                            <Run Text="{Binding Key}" />
-                            <Run Text=" - " />
-                            <Run Text="{Binding Fields.Summary}" />
+                            <Run Foreground="{StaticResource FontBrush}" Text="{Binding Key}" />
+                            <Run Foreground="{StaticResource FontBrush}" Text=" - " />
+                            <Run Foreground="{StaticResource FontBrush}" Text="{Binding Fields.Summary}" />
                         </TextBlock>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
@@ -79,6 +73,7 @@
             <ComboBox
                 Margin="0,0,0,5"
                 Background="{StaticResource GrayBrush3}"
+                Foreground="{StaticResource FontBrush}"
                 ItemsSource="{Binding Labels}"
                 SelectedItem="{Binding SelectedLabel}" />
 
@@ -87,6 +82,7 @@
             <ComboBox
                 Margin="0,0,0,5"
                 DisplayMemberPath="DisplayName"
+                Foreground="{StaticResource FontBrush}"
                 IsEditable="False"
                 ItemsSource="{Binding Assignees}"
                 SelectedItem="{Binding SelectedAssignee}" />
