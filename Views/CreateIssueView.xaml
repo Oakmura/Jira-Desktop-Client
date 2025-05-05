@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:JiraClient.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
     d:DesignHeight="600"
     d:DesignWidth="800"
     mc:Ignorable="d">
@@ -90,6 +91,7 @@
             <!--  Summary  -->
             <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Summary*" />
             <TextBox
+                Height="20"
                 Margin="0,0,0,5"
                 Background="{StaticResource GrayBrush3}"
                 BorderThickness="0"
@@ -108,22 +110,29 @@
                 Text="{Binding Description}"
                 VerticalScrollBarVisibility="Auto" />
 
-            <StackPanel>
+            <StackPanel Orientation="Horizontal">
                 <!--  Start Date  -->
-                <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Start Date" />
-                <DatePicker
-                    Margin="0,0,0,5"
-                    BorderThickness="0"
-                    Foreground="{StaticResource DisabledFontBrush}"
-                    SelectedDate="{Binding StartDate}" />
-
+                <StackPanel Margin="0,0,10,0">
+                    <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Start Date" />
+                    <DatePicker
+                        Margin="0,0,0,5"
+                        Background="{StaticResource GrayBrush3}"
+                        BorderThickness="0"
+                        FontSize="12"
+                        Foreground="{StaticResource FontBrush}"
+                        SelectedDate="{Binding StartDate}" />
+                </StackPanel>
                 <!--  Due Date  -->
-                <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Due Date" />
-                <DatePicker
-                    Margin="0,0,0,5"
-                    BorderThickness="0"
-                    Foreground="{StaticResource DisabledFontBrush}"
-                    SelectedDate="{Binding DueDate}" />
+                <StackPanel>
+                    <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Due Date" />
+                    <DatePicker
+                        Margin="0,0,0,5"
+                        Background="{StaticResource GrayBrush3}"
+                        BorderThickness="0"
+                        FontSize="12"
+                        Foreground="{StaticResource FontBrush}"
+                        SelectedDate="{Binding DueDate}" />
+                </StackPanel>
             </StackPanel>
 
             <!--  Estimates  -->
@@ -131,6 +140,7 @@
                 <StackPanel Margin="0,0,10,0">
                     <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Original Estimate (e.g. 1d 2h 30m)" />
                     <TextBox
+                        Height="20"
                         Background="{StaticResource GrayBrush3}"
                         BorderThickness="0"
                         Foreground="{StaticResource FontBrush}"
@@ -139,6 +149,7 @@
                 <StackPanel>
                     <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Remaining Estimate" />
                     <TextBox
+                        Height="20"
                         Background="{StaticResource GrayBrush3}"
                         BorderThickness="0"
                         Foreground="{StaticResource FontBrush}"
@@ -149,6 +160,7 @@
             <!--  Worklog  -->
             <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Worklog (Time Spent e.g. 1h, 30m)" />
             <TextBox
+                Height="20"
                 Margin="0,0,0,5"
                 Background="{StaticResource GrayBrush3}"
                 BorderThickness="0"
@@ -157,6 +169,7 @@
 
             <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Worklog Started (yyyy-MM-ddTHH:mm:ss)" />
             <TextBox
+                Height="20"
                 Margin="0,0,0,5"
                 Background="{StaticResource GrayBrush3}"
                 BorderThickness="0"
