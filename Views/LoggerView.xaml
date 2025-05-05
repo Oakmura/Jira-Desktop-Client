@@ -117,6 +117,12 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <DockPanel ToolTip="{Binding MetaData}">
+                            <DockPanel.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Click="OnCopyLogMessageClick" Header="Copy Message" />
+                                </ContextMenu>
+                            </DockPanel.ContextMenu>
+
                             <DockPanel.Style>
                                 <Style TargetType="DockPanel">
                                     <Setter Property="Background" Value="Transparent" />

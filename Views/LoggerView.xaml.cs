@@ -24,5 +24,16 @@ namespace JiraClient.Views
             if (toggleButtonErrors.IsChecked == true) filter |= (int)MessageType.Error;
             Logger.SetMessageFilter(filter);
         }
+
+        private void OnCopyLogMessageClick(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem menuItem &&
+                menuItem.Parent is ContextMenu contextMenu &&
+                contextMenu.PlacementTarget is FrameworkElement fe &&
+                fe.DataContext is LogMessage message)
+            {
+                Clipboard.SetText(message.Message);
+            }
+        }
     }
 }
