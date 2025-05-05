@@ -1,0 +1,81 @@
+﻿<Window
+    x:Class="JiraClient.Views.IssueFinderView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="Issue Finder"
+    Width="800"
+    Height="600"
+    FocusManager.FocusedElement="{Binding ElementName=SearchBox}"
+    PreviewKeyDown="OnWindowPreviewKeyDown"
+    Style="{StaticResource DialogStyle}"
+    WindowStartupLocation="CenterOwner"
+    mc:Ignorable="d">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBox
+            x:Name="SearchBox"
+            Grid.Row="0"
+            Height="25"
+            Margin="0,0,0,10"
+            Background="{StaticResource GrayBrush3}"
+            BorderThickness="0"
+            Foreground="{StaticResource FontBrush}"
+            PreviewKeyDown="OnSearchBoxPreviewKeyDown"
+            TextChanged="OnSearchTextChanged" />
+
+        <ListBox
+            x:Name="IssueListBox"
+            Grid.Row="1"
+            MouseDoubleClick="OnIssueDoubleClick"
+            PreviewKeyDown="OnIssueListBoxPreviewKeyDown"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+            SelectionMode="Single">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Margin="4,0" Orientation="Horizontal">
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontWeight="SemiBold"
+                            Foreground="LightGreen"
+                            Text="{Binding Fields.IssueType.Name, StringFormat=[{0}]}" />
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontWeight="Bold"
+                            Text="{Binding Key}" />
+                        <TextBlock Margin="0,0,8,0" Text="-" />
+                        <TextBlock
+                            Foreground="Gray"
+                            Text="{Binding Fields.Summary}"
+                            TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <StackPanel
+            Grid.Row="2"
+            Margin="0,10,0,0"
+            HorizontalAlignment="Right"
+            Orientation="Horizontal">
+            <Button
+                Width="100"
+                Margin="5,0"
+                Click="OnConfirmClick"
+                Content="확인"
+                IsDefault="True" />
+            <Button
+                Width="100"
+                Margin="5,0"
+                Content="취소"
+                IsCancel="True" />
+        </StackPanel>
+    </Grid>
+</Window>

@@ -38,6 +38,10 @@
             Key="R"
             Command="{Binding RefreshCommand}"
             Modifiers="Control" />
+        <KeyBinding
+            Key="K"
+            Command="{Binding OpenIssueFinderCommand}"
+            Modifiers="Control" />
     </Window.InputBindings>
 
     <Grid>

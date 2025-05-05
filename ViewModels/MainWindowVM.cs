@@ -7,6 +7,7 @@ using System.Windows.Input;
 using JiraClient.JiraAPI;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Windows;
 
 namespace JiraClient.ViewModels
 {
@@ -14,6 +15,7 @@ namespace JiraClient.ViewModels
     {
         public ICommand RefreshCommand { get; }
         public ICommand SwitchViewCommand { get; }
+        public ICommand OpenIssueFinderCommand { get; }
 
         private UserControl mCurrentView;
         public UserControl CurrentView
@@ -65,6 +67,7 @@ namespace JiraClient.ViewModels
 
             RefreshCommand = new RelayCommand(OnRefreshCommand);
             SwitchViewCommand = new RelayCommand<string>(OnSwitchViewCommand);
+            OpenIssueFinderCommand = new RelayCommand(OnOpenIssueFinderCommand);
 
             mIssueListVM = new IssueListVM();
             mIssueListView = new IssueListView();
@@ -110,6 +113,47 @@ namespace JiraClient.ViewModels
             mCreateFilterVM.OnRefreshCommand();
 
             mLastRefreshTime = DateTime.Now;
+        }
+
+        private void OnSwitchViewCommand(string action)
+        {
+            Logger.Log(MessageType.Info, $"Switching to {action} View");
+
+            switch (action)
+            {
+                case "View Issue":
+                    CurrentView = mViewIssueView;
+                    break;
+                case "Create Issue":
+                    CurrentView = mCreateIssueView;
+                    break;
+                case "Create Filter":
+                    CurrentView = mCreateFilterView;
+                    break;
+                default:
+                    Debug.Assert(false);
+                    break;
+            }
+        }
+
+        private void OnOpenIssueFinderCommand()
+        {
+            if (!mbInitialized)
+            {
+                Logger.Log(MessageType.Warning, "MainWindow Not Initialized");
+                return;
+            }
+
+            IssueFinderView finderWindow = new IssueFinderView(mJiraIssuesByID);
+            finderWindow.Owner = Application.Current.MainWindow;
+            if (finderWindow.ShowDialog() == true)
+            {
+                JiraIssue selected = finderWindow.SelectedIssue;
+                if (selected != null)
+                {
+                    SwitchToIssueDetailView(selected);
+                }
+            }
         }
 
         public void OnSelectedIssueChanged(JiraIssue jiraIssue)
@@ -169,27 +213,6 @@ namespace JiraClient.ViewModels
         {
             mViewIssueVM.OnSelectedIssueChanged(jiraIssue);
             CurrentView = mViewIssueView;
-        }
-
-        private void OnSwitchViewCommand(string action)
-        {
-            Logger.Log(MessageType.Info, $"Switching to {action} View");
-
-            switch (action)
-            {
-                case "View Issue":
-                    CurrentView = mViewIssueView;
-                    break;
-                case "Create Issue":
-                    CurrentView = mCreateIssueView;
-                    break;
-                case "Create Filter":
-                    CurrentView = mCreateFilterView;
-                    break;
-                default:
-                    Debug.Assert(false);
-                    break;
-            }
         }
 
         private async Task initialize()
