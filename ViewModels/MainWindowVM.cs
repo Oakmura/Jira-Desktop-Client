@@ -85,7 +85,7 @@ namespace JiraClient.ViewModels
             mCreateIssueView = new CreateIssueView();
             mCreateIssueView.DataContext = mCreateIssueVM;
 
-            CurrentView = mViewIssueView;
+            CurrentView = mCreateIssueView;
         }
 
         public void OnRefreshCommand()
