@@ -14,10 +14,11 @@
     </UserControl.Resources>
 
     <ScrollViewer DataContext="{Binding Issue}" VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="0,0,0,20" Orientation="Vertical">
+        <StackPanel Orientation="Vertical">
+
             <!--  Title  -->
             <TextBlock
-                Margin="0,0,0,10"
+                Margin="0,0,0,5"
                 FontSize="20"
                 FontWeight="Bold"
                 Style="{StaticResource LightTextBlockStyle}"
@@ -25,128 +26,134 @@
 
             <!--  Issue Path  -->
             <TextBlock
+                Margin="0,0,0,5"
+                FontSize="14"
                 FontWeight="Bold"
                 Style="{StaticResource LightTextBlockStyle}"
                 Text="{Binding DataContext.IssuePath, RelativeSource={RelativeSource AncestorType=UserControl}}" />
 
+            <!--  Project  -->
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Project" />
+            <TextBlock
+                Margin="0,0,0,5"
+                Style="{StaticResource LightTextBlockStyle}"
+                Text="{Binding Fields.Project.Name}" />
+
+            <!--  Issue Type  -->
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Issue Type" />
+            <TextBlock
+                Margin="0,0,0,5"
+                Style="{StaticResource LightTextBlockStyle}"
+                Text="{Binding Fields.IssueType.Name}" />
+
             <!--  Summary  -->
-            <TextBox
-                Margin="0,5,0,10"
-                FontWeight="SemiBold"
-                Style="{StaticResource TextBoxStyle}"
-                Text="{Binding Fields.Summary, Mode=TwoWay}" />
-
-            <!--  Details  -->
-            <GroupBox
-                Margin="0,10,0,0"
-                Foreground="{StaticResource FontBrush}"
-                Header="Details">
-                <StackPanel Margin="10">
-                    <TextBlock
-                        FontWeight="Bold"
-                        Style="{StaticResource LightTextBlockStyle}"
-                        Text="Type:" />
-                    <TextBox Style="{StaticResource TextBoxStyle}" Text="{Binding Fields.IssueType.Name, Mode=TwoWay}" />
-
-                    <TextBlock
-                        Margin="0,10,0,0"
-                        FontWeight="Bold"
-                        Style="{StaticResource LightTextBlockStyle}"
-                        Text="Status:" />
-                    <TextBox Style="{StaticResource TextBoxStyle}" Text="{Binding Fields.Status.Name, Mode=TwoWay}" />
-
-                    <TextBlock
-                        Margin="0,10,0,0"
-                        FontWeight="Bold"
-                        Style="{StaticResource LightTextBlockStyle}"
-                        Text="Created:" />
-                    <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="{Binding Fields.FormattedCreated}" />
-
-                    <TextBlock
-                        Margin="0,10,0,0"
-                        FontWeight="Bold"
-                        Style="{StaticResource LightTextBlockStyle}"
-                        Text="Updated:" />
-                    <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="{Binding Fields.FormattedUpdated}" />
-
-                    <TextBlock
-                        Margin="0,10,0,0"
-                        FontWeight="Bold"
-                        Style="{StaticResource LightTextBlockStyle}"
-                        Text="Resolution:" />
-                    <TextBox Style="{StaticResource TextBoxStyle}" Text="{Binding Fields.Resolution.Name, Mode=TwoWay}" />
-
-                    <TextBlock
-                        Margin="0,10,0,0"
-                        FontWeight="Bold"
-                        Style="{StaticResource LightTextBlockStyle}"
-                        Text="Labels:" />
-                    <ItemsControl ItemsSource="{Binding Fields.Labels}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock
-                                    Margin="0,0,5,0"
-                                    Style="{StaticResource LightTextBlockStyle}"
-                                    Text="{Binding}" />
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
-            </GroupBox>
-
-            <!--  Users  -->
-            <GroupBox
-                Margin="0,10,0,0"
-                Foreground="{StaticResource FontBrush}"
-                Header="Users">
-                <StackPanel Margin="10">
-                    <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="{Binding Fields.Assignee.DisplayName, StringFormat='Assignee: {0}'}" />
-                    <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="{Binding Fields.Reporter.DisplayName, StringFormat='Reporter: {0}'}" />
-                    <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="{Binding Fields.Creator.DisplayName, StringFormat='Creator: {0}'}" />
-                </StackPanel>
-            </GroupBox>
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Summary" />
+            <TextBlock
+                Margin="0,0,0,5"
+                Style="{StaticResource LightTextBlockStyle}"
+                Text="{Binding Fields.Summary}" />
 
             <!--  Description  -->
-            <GroupBox
-                Margin="0,10,0,0"
-                Foreground="{StaticResource FontBrush}"
-                Header="Description">
-                <TextBlock
-                    Margin="10"
-                    Style="{StaticResource LightTextBlockStyle}"
-                    Text="{Binding Fields.Description}"
-                    TextWrapping="Wrap" />
-            </GroupBox>
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Description" />
+            <TextBlock
+                Margin="0,0,0,5"
+                Style="{StaticResource LightTextBlockStyle}"
+                Text="{Binding Fields.Description}"
+                TextWrapping="Wrap" />
+
+            <!--  Status  -->
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Status" />
+            <TextBlock
+                Margin="0,0,0,5"
+                Style="{StaticResource LightTextBlockStyle}"
+                Text="{Binding Fields.Status.Name}" />
+
+            <!--  Labels  -->
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Labels" />
+            <ItemsControl MinHeight="20" ItemsSource="{Binding Fields.Labels}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock
+                            Margin="0,0,5,0"
+                            Style="{StaticResource LightTextBlockStyle}"
+                            Text="{Binding}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!--  Assignee  -->
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Assignee" />
+            <TextBlock
+                Margin="0,0,0,5"
+                Style="{StaticResource LightTextBlockStyle}"
+                Text="{Binding Fields.Assignee.DisplayName}" />
+
+            <!--  Reporter  -->
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Reporter" />
+            <TextBlock
+                Margin="0,0,0,5"
+                Style="{StaticResource LightTextBlockStyle}"
+                Text="{Binding Fields.Reporter.DisplayName}" />
+
+            <!--  Creator  -->
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Creator" />
+            <TextBlock
+                Margin="0,0,0,5"
+                Style="{StaticResource LightTextBlockStyle}"
+                Text="{Binding Fields.Creator.DisplayName}" />
+
+            <!--  Resolution  -->
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Resolution" />
+            <TextBlock
+                Margin="0,0,0,5"
+                Style="{StaticResource LightTextBlockStyle}"
+                Text="{Binding Fields.Resolution.Name}" />
+
+            <!--  Created  -->
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Created" />
+            <TextBlock
+                Margin="0,0,0,5"
+                Style="{StaticResource LightTextBlockStyle}"
+                Text="{Binding Fields.FormattedCreated}" />
+
+            <!--  Updated  -->
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Updated" />
+            <TextBlock
+                Margin="0,0,0,5"
+                Style="{StaticResource LightTextBlockStyle}"
+                Text="{Binding Fields.FormattedUpdated}" />
+
+            <!--  Due Date  -->
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Due Date" />
+            <TextBlock
+                Margin="0,0,0,5"
+                Style="{StaticResource LightTextBlockStyle}"
+                Text="{Binding Fields.FormattedDueDate}" />
 
             <!--  Linked Issues  -->
-            <GroupBox
-                Margin="0,10,0,0"
-                Foreground="{StaticResource FontBrush}"
-                Header="Linked Issues">
-                <ItemsControl Margin="10,5,0,0" ItemsSource="{Binding Fields.IssueLinks}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Vertical">
-                                <TextBlock
-                                    FontWeight="Bold"
-                                    Style="{StaticResource LightTextBlockStyle}"
-                                    Text="{Binding InwardDescription}"
-                                    Visibility="{Binding InwardDescription, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}" />
-                                <TextBlock
-                                    FontWeight="Bold"
-                                    Style="{StaticResource LightTextBlockStyle}"
-                                    Text="{Binding OutwardDescription}"
-                                    Visibility="{Binding OutwardDescription, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </GroupBox>
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Linked Issues" />
+            <ItemsControl Margin="0,5,0,0" ItemsSource="{Binding Fields.IssueLinks}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock
+                                Style="{StaticResource LightTextBlockStyle}"
+                                Text="{Binding InwardDescription}"
+                                Visibility="{Binding InwardDescription, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}" />
+                            <TextBlock
+                                Style="{StaticResource LightTextBlockStyle}"
+                                Text="{Binding OutwardDescription}"
+                                Visibility="{Binding OutwardDescription, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
         </StackPanel>
     </ScrollViewer>
 </UserControl>
