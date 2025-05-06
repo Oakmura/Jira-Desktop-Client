@@ -47,6 +47,13 @@ namespace JiraClient.ViewModels
             set { mDescription = value; OnPropertyChanged(); }
         }
 
+        private DateTime? mDueDate;
+        public DateTime? DueDate
+        {
+            get => mDueDate;
+            set { mDueDate = value; OnPropertyChanged(); }
+        }
+
         private IssueType mSelectedIssueType;
         public IssueType SelectedIssueType
         {
@@ -79,6 +86,7 @@ namespace JiraClient.ViewModels
             Project = jiraIssue.Fields.Project;
             Summary = jiraIssue.Fields.Summary;
             Description = jiraIssue.Fields.Description;
+            DueDate = string.IsNullOrWhiteSpace(jiraIssue.Fields.DueDate) ? null : DateTime.Parse(jiraIssue.Fields.DueDate);
 
             await updateIssueTypes();
             await loadAssignees(jiraIssue.Fields.Project);
@@ -153,6 +161,7 @@ namespace JiraClient.ViewModels
             {
                 Summary = mOriginalIssue.Fields.Summary;
                 Description = mOriginalIssue.Fields.Description;
+                DueDate = string.IsNullOrWhiteSpace(mOriginalIssue.Fields.DueDate) ? null : DateTime.Parse(mOriginalIssue.Fields.DueDate);
                 SelectedIssueType = IssueTypes.FirstOrDefault(x => x.ID == mOriginalIssue.Fields.IssueType.ID);
                 SelectedAssignee = Assignees.FirstOrDefault(x => x.AccountID == mOriginalIssue.Fields.Assignee?.AccountID);
             }
@@ -161,7 +170,9 @@ namespace JiraClient.ViewModels
         private async Task OnUpdateIssueCommand()
         {
             if (mOriginalIssue == null)
+            {
                 return;
+            }
 
             JiraUpdateAPI.UpdateJiraIssueRequest update = new JiraUpdateAPI.UpdateJiraIssueRequest
             {
@@ -169,6 +180,7 @@ namespace JiraClient.ViewModels
                 {
                     Summary = Summary,
                     Description = Description,
+                    DueDate = DueDate?.ToString("yyyy-MM-dd"),
                     IssueType = SelectedIssueType != null ? new IssueType { ID = SelectedIssueType.ID } : null,
                     Assignee = SelectedAssignee != null ? new User { AccountID = SelectedAssignee.AccountID } : null
                 }

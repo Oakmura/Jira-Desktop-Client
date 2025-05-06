@@ -31,6 +31,14 @@
                 Style="{StaticResource LightTextBlockStyle}"
                 Text="{Binding IssuePath}" />
 
+            <!--  Project  -->
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Project" />
+            <TextBlock
+                Margin="0,0,0,5"
+                Style="{StaticResource LightTextBlockStyle}"
+                Text="{Binding Project.Name}" />
+
+            <!--  Issue Type  -->
             <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Issue Type" />
             <ComboBox
                 Margin="0,0,0,5"
@@ -39,12 +47,14 @@
                 ItemsSource="{Binding IssueTypes}"
                 SelectedItem="{Binding SelectedIssueType, Mode=TwoWay}" />
 
+            <!--  Summary  -->
             <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Summary" />
             <TextBox
                 Margin="0,0,0,5"
                 FontSize="12"
                 Text="{Binding Summary, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
+            <!--  Description  -->
             <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Description" />
             <TextBox
                 MinHeight="100"
@@ -55,6 +65,7 @@
                 TextWrapping="Wrap"
                 VerticalScrollBarVisibility="Auto" />
 
+            <!--  Assignee  -->
             <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Assignee" />
             <ComboBox
                 Margin="0,0,0,5"
@@ -64,6 +75,11 @@
                 ItemsSource="{Binding Assignees}"
                 SelectedItem="{Binding SelectedAssignee, Mode=TwoWay}" />
 
+            <!--  Due Date  -->
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Due Date" />
+            <DatePicker Margin="0,0,0,5" SelectedDate="{Binding DueDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+            <!--  Buttons  -->
             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                 <Button
                     Width="160"
