@@ -8,7 +8,7 @@
 
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ui:ThemeResources />
+                <ui:ThemeResources RequestedTheme="Dark" />
                 <ui:XamlControlsResources />
 
                 <ResourceDictionary Source="pack://application:,,,/Dictionaries/Colors.xaml" />
