@@ -56,6 +56,7 @@ namespace JiraClient.ViewModels
         // TODO: should keep this to private
         public Dictionary<string, JiraIssue> mJiraIssuesByID { get; set; }
         private Dictionary<string, List<string>> mJiraIssuesByJQL;
+        public List<string> UniqueProjectKeys { get; private set; }
 
         bool mbInitialized = false;
         private DateTime mLastRefreshTime = DateTime.MinValue;
@@ -219,8 +220,10 @@ namespace JiraClient.ViewModels
         {
             mJiraIssuesByID = await JiraReadAPI.ReadAllJiraIssues();
             mJiraIssuesByJQL = await JiraReadAPI.ReadAllJiraIssuesByJQL();
+            UniqueProjectKeys = mJiraIssuesByID.Select(pair => pair.Value.Fields.Project.Key).Distinct().ToList();
 
-            mCreateIssueVM.ReadJiraIssueTypesByProject(mJiraIssuesByID.Select(pair => pair.Value.Fields.Project.Key).Distinct().ToList());
+            mCreateIssueVM.ReadJiraIssueTypesByProject(UniqueProjectKeys);
+            mViewIssueVM.ReadJiraIssueTypesByProject(UniqueProjectKeys);
 
             Stopwatch sw = Stopwatch.StartNew();
             foreach (KeyValuePair<string, JiraIssue> issueKeyToIssue in mJiraIssuesByID)

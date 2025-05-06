@@ -5,6 +5,8 @@
     xmlns:converters="clr-namespace:JiraClient.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewmodels="clr-namespace:JiraClient.ViewModels"
+    d:DataContext="{d:DesignInstance Type=viewmodels:ViewIssueVM}"
     d:DesignHeight="600"
     d:DesignWidth="800"
     mc:Ignorable="d">
@@ -13,147 +15,71 @@
         <converters:StringNullOrEmptyToVisibilityConverter x:Key="StringNullOrEmptyToVisibilityConverter" />
     </UserControl.Resources>
 
-    <ScrollViewer DataContext="{Binding Issue}" VerticalScrollBarVisibility="Auto">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Orientation="Vertical">
-
-            <!--  Title  -->
             <TextBlock
                 Margin="0,0,0,5"
                 FontSize="20"
                 FontWeight="Bold"
                 Style="{StaticResource LightTextBlockStyle}"
-                Text="View Issue" />
-
-            <!--  Issue Path  -->
+                Text="View / Edit Issue" />
             <TextBlock
                 Margin="0,0,0,5"
+                d:Text="C10-21 / C10-40"
                 FontSize="14"
                 FontWeight="Bold"
                 Style="{StaticResource LightTextBlockStyle}"
-                Text="{Binding DataContext.IssuePath, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                Text="{Binding IssuePath}" />
 
-            <!--  Project  -->
-            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Project" />
-            <TextBlock
-                Margin="0,0,0,5"
-                Style="{StaticResource LightTextBlockStyle}"
-                Text="{Binding Fields.Project.Name}" />
-
-            <!--  Issue Type  -->
             <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Issue Type" />
-            <TextBlock
+            <ComboBox
                 Margin="0,0,0,5"
-                Style="{StaticResource LightTextBlockStyle}"
-                Text="{Binding Fields.IssueType.Name}" />
+                DisplayMemberPath="Name"
+                Foreground="{StaticResource FontBrush}"
+                ItemsSource="{Binding IssueTypes}"
+                SelectedItem="{Binding SelectedIssueType, Mode=TwoWay}" />
 
-            <!--  Summary  -->
             <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Summary" />
-            <TextBlock
+            <TextBox
                 Margin="0,0,0,5"
-                Style="{StaticResource LightTextBlockStyle}"
-                Text="{Binding Fields.Summary}" />
+                FontSize="12"
+                Text="{Binding Summary, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-            <!--  Description  -->
             <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Description" />
-            <TextBlock
+            <TextBox
+                MinHeight="100"
                 Margin="0,0,0,5"
-                Style="{StaticResource LightTextBlockStyle}"
-                Text="{Binding Fields.Description}"
-                TextWrapping="Wrap" />
+                AcceptsReturn="True"
+                FontSize="12"
+                Text="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                TextWrapping="Wrap"
+                VerticalScrollBarVisibility="Auto" />
 
-            <!--  Status  -->
-            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Status" />
-            <TextBlock
-                Margin="0,0,0,5"
-                Style="{StaticResource LightTextBlockStyle}"
-                Text="{Binding Fields.Status.Name}" />
-
-            <!--  Labels  -->
-            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Labels" />
-            <ItemsControl MinHeight="20" ItemsSource="{Binding Fields.Labels}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock
-                            Margin="0,0,5,0"
-                            Style="{StaticResource LightTextBlockStyle}"
-                            Text="{Binding}" />
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-
-            <!--  Assignee  -->
             <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Assignee" />
-            <TextBlock
+            <ComboBox
                 Margin="0,0,0,5"
-                Style="{StaticResource LightTextBlockStyle}"
-                Text="{Binding Fields.Assignee.DisplayName}" />
+                DisplayMemberPath="DisplayName"
+                Foreground="{StaticResource FontBrush}"
+                IsTextSearchEnabled="True"
+                ItemsSource="{Binding Assignees}"
+                SelectedItem="{Binding SelectedAssignee, Mode=TwoWay}" />
 
-            <!--  Reporter  -->
-            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Reporter" />
-            <TextBlock
-                Margin="0,0,0,5"
-                Style="{StaticResource LightTextBlockStyle}"
-                Text="{Binding Fields.Reporter.DisplayName}" />
-
-            <!--  Creator  -->
-            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Creator" />
-            <TextBlock
-                Margin="0,0,0,5"
-                Style="{StaticResource LightTextBlockStyle}"
-                Text="{Binding Fields.Creator.DisplayName}" />
-
-            <!--  Resolution  -->
-            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Resolution" />
-            <TextBlock
-                Margin="0,0,0,5"
-                Style="{StaticResource LightTextBlockStyle}"
-                Text="{Binding Fields.Resolution.Name}" />
-
-            <!--  Created  -->
-            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Created" />
-            <TextBlock
-                Margin="0,0,0,5"
-                Style="{StaticResource LightTextBlockStyle}"
-                Text="{Binding Fields.FormattedCreated}" />
-
-            <!--  Updated  -->
-            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Updated" />
-            <TextBlock
-                Margin="0,0,0,5"
-                Style="{StaticResource LightTextBlockStyle}"
-                Text="{Binding Fields.FormattedUpdated}" />
-
-            <!--  Due Date  -->
-            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Due Date" />
-            <TextBlock
-                Margin="0,0,0,5"
-                Style="{StaticResource LightTextBlockStyle}"
-                Text="{Binding Fields.FormattedDueDate}" />
-
-            <!--  Linked Issues  -->
-            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Linked Issues" />
-            <ItemsControl Margin="0,5,0,0" ItemsSource="{Binding Fields.IssueLinks}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock
-                                Style="{StaticResource LightTextBlockStyle}"
-                                Text="{Binding InwardDescription}"
-                                Visibility="{Binding InwardDescription, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}" />
-                            <TextBlock
-                                Style="{StaticResource LightTextBlockStyle}"
-                                Text="{Binding OutwardDescription}"
-                                Visibility="{Binding OutwardDescription, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-
+            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                <Button
+                    Width="160"
+                    Height="40"
+                    Margin="0,30,10,30"
+                    HorizontalAlignment="Center"
+                    Command="{Binding UpdateIssueCommand}"
+                    Content="Update" />
+                <Button
+                    Width="160"
+                    Height="40"
+                    Margin="0,30"
+                    HorizontalAlignment="Center"
+                    Command="{Binding ResetIssueCommand}"
+                    Content="Reset" />
+            </StackPanel>
         </StackPanel>
     </ScrollViewer>
 </UserControl>
