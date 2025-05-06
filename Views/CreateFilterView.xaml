@@ -70,6 +70,7 @@
                 Background="{StaticResource GrayBrush3}"
                 BorderThickness="0"
                 Foreground="{StaticResource FontBrush}"
+                Style="{StaticResource TextBoxStyle}"
                 Text="{Binding NewFilterName, UpdateSourceTrigger=PropertyChanged}" />
 
             <TextBlock
@@ -83,6 +84,7 @@
                 Background="{StaticResource GrayBrush3}"
                 BorderThickness="0"
                 Foreground="{StaticResource FontBrush}"
+                Style="{StaticResource TextBoxStyle}"
                 Text="{Binding NewFilterJQL, UpdateSourceTrigger=PropertyChanged}" />
 
             <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">

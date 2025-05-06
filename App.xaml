@@ -13,6 +13,7 @@
 
                 <ResourceDictionary Source="pack://application:,,,/Dictionaries/Colors.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Dictionaries/ComboBoxTemplates.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Dictionaries/TextBoxTemplates.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Dictionaries/ControlTemplates.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

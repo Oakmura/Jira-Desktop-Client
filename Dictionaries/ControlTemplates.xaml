@@ -10,17 +10,6 @@
         <Setter Property="FontFamily" Value="Gothic" />
     </Style>
 
-    <Style x:Key="TextBoxStyle" TargetType="{x:Type TextBox}">
-        <Setter Property="Foreground" Value="{StaticResource FontBrush}" />
-        <Setter Property="Background" Value="{StaticResource GrayBrush2}" />
-        <Setter Property="BorderBrush" Value="{StaticResource GrayBrush4}" />
-        <Setter Property="SelectionBrush" Value="White" />
-        <Setter Property="FontFamily" Value="Gothic" />
-        <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="HorizontalAlignment" Value="Stretch" />
-        <Setter Property="Padding" Value="0,2" />
-    </Style>
-
     <Style x:Key="FocusVisual">
         <Setter Property="Control.Template">
             <Setter.Value>
