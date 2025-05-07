@@ -14,6 +14,8 @@ namespace JiraClient.ViewModels
         public ICommand UpdateIssueCommand { get; }
         public ICommand ResetIssueCommand { get; }
 
+        public JiraIssue OriginalIssue => mOriginalIssue;
+
         private JiraIssue mOriginalIssue;
 
         // Editable fields
@@ -82,6 +84,7 @@ namespace JiraClient.ViewModels
         public async void OnSelectedIssueChanged(JiraIssue jiraIssue)
         {
             mOriginalIssue = jiraIssue;
+            OnPropertyChanged(nameof(OriginalIssue));
             IssuePath = buildIssuePath(jiraIssue);
 
             Project = jiraIssue.Fields.Project;

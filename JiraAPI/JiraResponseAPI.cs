@@ -37,9 +37,6 @@ namespace JiraClient.JiraAPI
         [JsonProperty("parent")]
         public JiraIssue Parent { get; set; }
 
-        // [JsonProperty("subtasks")]
-        // public List<JiraIssue> SubTasks { get; set; }
-
         [JsonProperty("subtasks")]
         public ObservableCollection<JiraIssue> SubTasks { get; set; }
 

@@ -31,23 +31,60 @@
                 Style="{StaticResource LightTextBlockStyle}"
                 Text="{Binding IssuePath}" />
 
-            <!--  Project  -->
-            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Project" />
-            <TextBlock
-                Margin="0,0,0,5"
-                HorizontalAlignment="Stretch"
-                d:Text="C10"
-                Style="{StaticResource LightTextBlockStyle}"
-                Text="{Binding Project.Name}" />
+            <!--  Project + Issue Type + Labels (inline layout)  -->
+            <StackPanel Margin="0,0,0,5" Orientation="Horizontal">
+                <!--  Project  -->
+                <StackPanel
+                    Width="180"
+                    Margin="0,0,20,0"
+                    Orientation="Vertical">
+                    <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Project" />
+                    <TextBlock
+                        Margin="0,2,0,0"
+                        Style="{StaticResource LightTextBlockStyle}"
+                        Text="{Binding Project.Name}" />
+                </StackPanel>
 
-            <!--  Issue Type  -->
-            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Issue Type" />
-            <ComboBox
-                Margin="0,0,0,5"
-                DisplayMemberPath="Name"
-                Foreground="{StaticResource FontBrush}"
-                ItemsSource="{Binding IssueTypes}"
-                SelectedItem="{Binding SelectedIssueType, Mode=TwoWay}" />
+                <!--  Issue Type  -->
+                <StackPanel
+                    Width="120"
+                    Margin="0,0,20,0"
+                    Orientation="Vertical">
+                    <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Issue Type" />
+                    <ComboBox
+                        Margin="0,2,0,0"
+                        DisplayMemberPath="Name"
+                        Foreground="{StaticResource FontBrush}"
+                        ItemsSource="{Binding IssueTypes}"
+                        SelectedItem="{Binding SelectedIssueType, Mode=TwoWay}" />
+                </StackPanel>
+
+                <!--  Labels  -->
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Labels" />
+                    <ItemsControl Margin="5,2,0,0" ItemsSource="{Binding OriginalIssue.Fields.Labels}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border
+                                    Margin="2"
+                                    Padding="5,2"
+                                    Background="{StaticResource GrayBrush3}"
+                                    BorderBrush="{StaticResource FontBrush}">
+                                    <TextBlock
+                                        FontSize="12"
+                                        Foreground="{StaticResource FontBrush}"
+                                        Text="{Binding}" />
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </StackPanel>
 
             <!--  Summary  -->
             <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Summary" />
@@ -67,19 +104,121 @@
                 TextWrapping="Wrap"
                 VerticalScrollBarVisibility="Auto" />
 
-            <!--  Assignee  -->
-            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Assignee" />
-            <ComboBox
-                Margin="0,0,0,5"
-                DisplayMemberPath="DisplayName"
-                Foreground="{StaticResource FontBrush}"
-                IsTextSearchEnabled="True"
-                ItemsSource="{Binding Assignees}"
-                SelectedItem="{Binding SelectedAssignee, Mode=TwoWay}" />
+            <!--  SubTasks  -->
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Sub-Tasks" />
+            <ItemsControl MinHeight="20" ItemsSource="{Binding OriginalIssue.Fields.SubTasks}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border
+                            Margin="2"
+                            Padding="5,2"
+                            Background="{StaticResource GrayBrush3}"
+                            BorderBrush="{StaticResource FontBrush}">
+                            <TextBlock Foreground="{StaticResource FontBrush}" Text="{Binding Key}" />
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
 
-            <!--  Due Date  -->
-            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Due Date" />
-            <DatePicker Margin="0,0,0,5" SelectedDate="{Binding DueDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <!--  Status + Resolution  -->
+            <StackPanel
+                Margin="0,0,0,5"
+                HorizontalAlignment="Left"
+                Orientation="Horizontal">
+                <StackPanel Margin="0,0,20,0" Orientation="Vertical">
+                    <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Status" />
+                    <TextBlock
+                        Margin="5,0,0,0"
+                        Style="{StaticResource LightTextBlockStyle}"
+                        Text="{Binding OriginalIssue.Fields.Status.Name}" />
+                </StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Resolution" />
+                    <TextBlock
+                        Margin="5,0,0,0"
+                        Style="{StaticResource LightTextBlockStyle}"
+                        Text="{Binding OriginalIssue.Fields.Resolution.Name}" />
+                </StackPanel>
+            </StackPanel>
+
+            <!--  Creator + Reporter + Assignee  -->
+            <StackPanel
+                Margin="0,0,0,5"
+                HorizontalAlignment="Left"
+                Orientation="Horizontal">
+                <StackPanel Margin="0,0,20,0" Orientation="Vertical">
+                    <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Creator" />
+                    <TextBlock
+                        Margin="5,0,0,0"
+                        Style="{StaticResource LightTextBlockStyle}"
+                        Text="{Binding OriginalIssue.Fields.Creator.DisplayName}" />
+                </StackPanel>
+                <StackPanel Margin="0,0,20,0" Orientation="Vertical">
+                    <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Reporter" />
+                    <TextBlock
+                        Margin="5,0,0,0"
+                        Style="{StaticResource LightTextBlockStyle}"
+                        Text="{Binding OriginalIssue.Fields.Reporter.DisplayName}" />
+                </StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Assignee" />
+                    <ComboBox
+                        Margin="0,0,0,5"
+                        DisplayMemberPath="DisplayName"
+                        Foreground="{StaticResource FontBrush}"
+                        IsTextSearchEnabled="True"
+                        ItemsSource="{Binding Assignees}"
+                        SelectedItem="{Binding SelectedAssignee, Mode=TwoWay}" />
+                </StackPanel>
+            </StackPanel>
+
+            <!--  Created + Updated + Due Date  -->
+            <StackPanel
+                Margin="0,0,0,5"
+                HorizontalAlignment="Left"
+                Orientation="Horizontal">
+                <StackPanel Margin="0,0,20,0" Orientation="Vertical">
+                    <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Created" />
+                    <TextBlock
+                        Margin="5,0,0,0"
+                        Style="{StaticResource LightTextBlockStyle}"
+                        Text="{Binding OriginalIssue.Fields.FormattedCreated}" />
+                </StackPanel>
+                <StackPanel Margin="0,0,20,0" Orientation="Vertical">
+                    <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Updated" />
+                    <TextBlock
+                        Margin="5,0,0,0"
+                        Style="{StaticResource LightTextBlockStyle}"
+                        Text="{Binding OriginalIssue.Fields.FormattedUpdated}" />
+                </StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Due Date" />
+                    <DatePicker Margin="0,0,0,5" SelectedDate="{Binding DueDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+            </StackPanel>
+
+            <!--  Issue Links  -->
+            <StackPanel Margin="0,0,0,5" Orientation="Vertical">
+                <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Issue Links" />
+                <ItemsControl Margin="5,0,0,0" ItemsSource="{Binding OriginalIssue.Fields.IssueLinks}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="0,2,0,0" Orientation="Horizontal">
+                                <TextBlock
+                                    Margin="0,0,10,0"
+                                    Style="{StaticResource LightTextBlockStyle}"
+                                    Text="{Binding InwardDescription}" />
+                                <TextBlock Style="{StaticResource LightTextBlockStyle}" Text="{Binding OutwardDescription}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
 
             <!--  Buttons  -->
             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
