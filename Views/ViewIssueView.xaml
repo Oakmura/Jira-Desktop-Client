@@ -35,6 +35,8 @@
             <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Project" />
             <TextBlock
                 Margin="0,0,0,5"
+                HorizontalAlignment="Stretch"
+                d:Text="C10"
                 Style="{StaticResource LightTextBlockStyle}"
                 Text="{Binding Project.Name}" />
 

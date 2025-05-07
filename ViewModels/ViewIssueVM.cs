@@ -71,6 +71,7 @@ namespace JiraClient.ViewModels
         public ObservableCollection<IssueType> IssueTypes { get; } = new();
         public ObservableCollection<User> Assignees { get; } = new();
         private Dictionary<string, List<IssueType>> mJiraIssueTypeByProject;
+        private Dictionary<string, List<User>> mAssignableUsersByProject;
 
         public ViewIssueVM()
         {
@@ -91,7 +92,6 @@ namespace JiraClient.ViewModels
             await updateIssueTypes();
             await loadAssignees(jiraIssue.Fields.Project);
 
-            SelectedIssueType = IssueTypes.FirstOrDefault(x => x.ID == jiraIssue.Fields.IssueType.ID);
             SelectedAssignee = Assignees.FirstOrDefault(x => x.AccountID == jiraIssue.Fields.Assignee?.AccountID);
         }
 
@@ -100,6 +100,11 @@ namespace JiraClient.ViewModels
             mJiraIssueTypeByProject = await JiraReadAPI.ReadIssueTypesByProjectAsync(uniqueProjectKeys);
 
             _ = updateIssueTypes();
+        }
+
+        public void SetAssignableUsersByProject(Dictionary<string, List<User>> assignableUsersByProject)
+        {
+            mAssignableUsersByProject = assignableUsersByProject;
         }
 
         private async Task updateIssueTypes()
@@ -111,47 +116,97 @@ namespace JiraClient.ViewModels
             }
 
             List<IssueType> allIssueTypes = mJiraIssueTypeByProject[mProject.Key];
-
             string currentTypeName = mOriginalIssue?.Fields.IssueType.Name.ToLowerInvariant();
             Debug.Assert(!string.IsNullOrWhiteSpace(currentTypeName), "Current issue type must be defined");
 
-            Application.Current.Dispatcher.Invoke(() =>
+            // 1. 현재 타입 우선 추가 + 바로 선택
+            IssueType currentType = allIssueTypes.FirstOrDefault(t => t.Name.Equals(currentTypeName, StringComparison.OrdinalIgnoreCase));
+            if (currentType != null)
             {
-                IssueTypes.Clear();
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    IssueTypes.Clear();                          // 완전히 비우고
+                    IssueTypes.Add(currentType);                 // 현재 타입만 먼저 추가
+                    SelectedIssueType = currentType;             // 즉시 선택되도록 설정
+                });
+            }
 
-                // epic 또는 sub-task는 해당 타입만 선택 가능
-                if (currentTypeName == "epic" || currentTypeName == "sub-task")
+            // 2. 나머지 타입 비동기 추가
+            await Task.Run(() =>
+            {
+                List<IssueType> toAdd = new();
+
+                if (currentTypeName != "epic" && currentTypeName != "sub-task")
                 {
-                    IssueType onlyType = allIssueTypes.FirstOrDefault(t => t.Name.Equals(currentTypeName, StringComparison.OrdinalIgnoreCase));
-                    if (onlyType != null)
-                    {
-                        IssueTypes.Add(onlyType);
-                    }
+                    toAdd = allIssueTypes
+                        .Where(t =>
+                            !t.Name.Equals("epic", StringComparison.OrdinalIgnoreCase) &&
+                            !t.Name.Equals("sub-task", StringComparison.OrdinalIgnoreCase) &&
+                            !t.Name.Equals(currentTypeName, StringComparison.OrdinalIgnoreCase))
+                        .ToList();
                 }
-                else
+
+                if (toAdd.Count > 0)
                 {
-                    foreach (IssueType type in allIssueTypes)
+                    Application.Current.Dispatcher.Invoke(() =>
                     {
-                        string typeName = type.Name.ToLowerInvariant();
-                        if (typeName != "epic" && typeName != "sub-task")
+                        foreach (IssueType type in toAdd)
                         {
-                            IssueTypes.Add(type);
+                            // ID 대소문자 구분 없이 비교
+                            if (!IssueTypes.Any(t => t.ID == type.ID))
+                            {
+                                IssueTypes.Add(type);
+                            }
                         }
-                    }
+                    });
                 }
             });
         }
 
-        private async Task loadAssignees(Project project)
+        private Task loadAssignees(Project project)
         {
-            List<User> users = await JiraReadAPI.ReadAssignableUsersAsync(project.Key);
-            Application.Current.Dispatcher.Invoke(() =>
+            return Task.Run(() =>
             {
-                Assignees.Clear();
-                foreach (User user in users)
+                if (mOriginalIssue?.Fields.Assignee == null)
                 {
-                    Assignees.Add(user);
+                    return;
                 }
+
+                User currentAssignee = mOriginalIssue.Fields.Assignee;
+                List<User> allUsers;
+
+                if (!mAssignableUsersByProject.TryGetValue(project.Key, out allUsers) || allUsers == null || allUsers.Count == 0)
+                {
+                    // fallback: currentAssignee만 보여주기
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        Assignees.Clear();
+                        Assignees.Add(currentAssignee);
+                        SelectedAssignee = currentAssignee;
+                    });
+                    return;
+                }
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    Assignees.Clear();
+
+                    // currentAssignee 먼저 추가 (중복 방지)
+                    if (!allUsers.Any(u => u.AccountID == currentAssignee.AccountID))
+                    {
+                        Assignees.Add(currentAssignee);
+                    }
+
+                    foreach (User user in allUsers)
+                    {
+                        if (!Assignees.Any(u => u.AccountID == user.AccountID))
+                        {
+                            Assignees.Add(user);
+                        }
+                    }
+
+                    SelectedAssignee = Assignees.FirstOrDefault(x => x.AccountID == currentAssignee.AccountID);
+                });
             });
         }
 

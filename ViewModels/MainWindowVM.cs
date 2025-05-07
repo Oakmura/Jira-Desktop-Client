@@ -56,6 +56,8 @@ namespace JiraClient.ViewModels
         // TODO: should keep this to private
         public Dictionary<string, JiraIssue> mJiraIssuesByID { get; set; }
         private Dictionary<string, List<string>> mJiraIssuesByJQL;
+        private Dictionary<string, List<User>> mAssignableUsersByProject;
+
         public List<string> UniqueProjectKeys { get; private set; }
 
         bool mbInitialized = false;
@@ -224,6 +226,17 @@ namespace JiraClient.ViewModels
 
             mCreateIssueVM.ReadJiraIssueTypesByProject(UniqueProjectKeys);
             mViewIssueVM.ReadJiraIssueTypesByProject(UniqueProjectKeys);
+
+            Stopwatch assigneeLoadWatch = Stopwatch.StartNew();
+            mAssignableUsersByProject = new();
+            foreach (string key in UniqueProjectKeys)
+            {
+                List<User> users = await JiraReadAPI.ReadAssignableUsersAsync(key);
+                mAssignableUsersByProject[key] = users;
+            }
+            mViewIssueVM.SetAssignableUsersByProject(mAssignableUsersByProject);
+            assigneeLoadWatch.Stop();
+            Logger.Log(MessageType.Info, $"Assignable user loading took {assigneeLoadWatch.Elapsed} seconds");
 
             Stopwatch sw = Stopwatch.StartNew();
             foreach (KeyValuePair<string, JiraIssue> issueKeyToIssue in mJiraIssuesByID)
