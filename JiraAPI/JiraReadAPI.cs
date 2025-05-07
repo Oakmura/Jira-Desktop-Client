@@ -271,6 +271,41 @@ namespace JiraClient.JiraAPI
 
             return issueTypeMap;
         }
+        public static async Task<Dictionary<string, List<User>>> ReadAssignableUsersAsync(List<string> projectKeys)
+        {
+            Debug.Assert(projectKeys != null && projectKeys.Count != 0, "ReadAssignableUsersAsync(projectKeys) : project Keys is null or empty");
+
+            using (HttpClient client = JiraCommonAPI.CreateHttpClient())
+            {
+                List<Task<(string, List<User>)>> tasks = new List<Task<(string, List<User>)>>();
+
+                foreach (string projectKey in projectKeys)
+                {
+                    tasks.Add(Task.Run(async () =>
+                    {
+                        string project = string.IsNullOrWhiteSpace(projectKey) ? (Settings.DEFAULT_PROJECT_KEY ?? "C10") : projectKey;
+                        HttpResponseMessage response = await client.GetAsync($"{Settings.JiraBaseURL}/rest/api/latest/user/assignable/search?project=" + project);
+                        response.EnsureSuccessStatusCode();
+
+                        string json = await response.Content.ReadAsStringAsync();
+                        List<User> userList = JsonConvert.DeserializeObject<List<User>>(json);
+
+                        Logger.Log(MessageType.Info, "Assignee " + userList.Count + "명 가져옴 (Project: " + project + ")");
+                        return (project, userList);
+                    }));
+                }
+
+                (string, List<User>)[] results = await Task.WhenAll(tasks);
+
+                Dictionary<string, List<User>> resultDict = new Dictionary<string, List<User>>();
+                foreach ((string project, List<User> userList) in results)
+                {
+                    resultDict[project] = userList;
+                }
+
+                return resultDict;
+            }
+        }
 
         public static async Task<List<User>> ReadAssignableUsersAsync(string projectKey)
         {

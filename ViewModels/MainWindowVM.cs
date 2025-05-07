@@ -228,12 +228,7 @@ namespace JiraClient.ViewModels
             mViewIssueVM.ReadJiraIssueTypesByProject(UniqueProjectKeys);
 
             Stopwatch assigneeLoadWatch = Stopwatch.StartNew();
-            mAssignableUsersByProject = new();
-            foreach (string key in UniqueProjectKeys)
-            {
-                List<User> users = await JiraReadAPI.ReadAssignableUsersAsync(key);
-                mAssignableUsersByProject[key] = users;
-            }
+            mAssignableUsersByProject = await JiraReadAPI.ReadAssignableUsersAsync(UniqueProjectKeys);
             mViewIssueVM.SetAssignableUsersByProject(mAssignableUsersByProject);
             assigneeLoadWatch.Stop();
             Logger.Log(MessageType.Info, $"Assignable user loading took {assigneeLoadWatch.Elapsed} seconds");
