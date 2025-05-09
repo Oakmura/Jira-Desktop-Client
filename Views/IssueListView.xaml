@@ -13,6 +13,7 @@
             BorderThickness="0"
             ItemsSource="{Binding HierarchicalIssueList}"
             MouseDoubleClick="SelectedIssueDoubleClick"
+            KeyDown="IssueTreeView_KeyDown"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
             ScrollViewer.VerticalScrollBarVisibility="Auto"
             SelectedItemChanged="SelectedIssueChanged">

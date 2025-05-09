@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using JiraClient.JiraAPI;
 using JiraClient.Utilities;
 using JiraClient.ViewModels;
@@ -68,6 +69,29 @@ namespace JiraClient.Views
                 var mainWindowVM = mainWindow.DataContext as MainWindowVM;
 
                 mainWindowVM.OnIssueDeleted(selectedIssue);
+            }
+        }
+
+        private void IssueTreeView_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                TreeView treeView = sender as TreeView;
+                if (treeView == null)
+                {
+                    return;
+                }
+
+                if (treeView.SelectedItem is JiraIssue selectedIssue)
+                {
+                    Logger.Log(MessageType.Info, $"Selected issue Enter-key triggered: {selectedIssue.Key}");
+
+                    MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
+                    MainWindowVM mainWindowVM = mainWindow.DataContext as MainWindowVM;
+
+                    mainWindowVM.SwitchToIssueDetailView(selectedIssue);
+                    e.Handled = true;
+                }
             }
         }
     }
