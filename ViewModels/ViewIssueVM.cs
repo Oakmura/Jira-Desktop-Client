@@ -72,6 +72,9 @@ namespace JiraClient.ViewModels
 
         public ObservableCollection<IssueType> IssueTypes { get; } = new();
         public ObservableCollection<User> Assignees { get; } = new();
+        public ObservableCollection<Attachment> Attachments { get; } = new();
+        public ObservableCollection<Comment> Comments { get; } = new();
+
         private Dictionary<string, List<IssueType>> mJiraIssueTypeByProject;
         private Dictionary<string, List<User>> mAssignableUsersByProject;
 
@@ -91,6 +94,18 @@ namespace JiraClient.ViewModels
             Summary = jiraIssue.Fields.Summary;
             Description = jiraIssue.Fields.Description;
             DueDate = string.IsNullOrWhiteSpace(jiraIssue.Fields.DueDate) ? null : DateTime.Parse(jiraIssue.Fields.DueDate);
+
+            Attachments.Clear();
+            foreach (var att in jiraIssue.Fields.Attachment ?? Enumerable.Empty<Attachment>())
+            {
+                Attachments.Add(att);
+            }
+
+            Comments.Clear();
+            foreach (var cmt in jiraIssue.Fields.Comment?.Comments ?? Enumerable.Empty<Comment>())
+            {
+                Comments.Add(cmt);
+            }
 
             await updateIssueTypes();
             await loadAssignees(jiraIssue.Fields.Project);

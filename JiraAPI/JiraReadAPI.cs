@@ -10,6 +10,7 @@ namespace JiraClient.JiraAPI
 {
     public static class JiraReadAPI
     {
+        // 단일 이슈에 대해서는 attachment와 comment 필드를 모두 받아올 수 있음
         public static async Task<JiraIssue> ReadSingleJiraIssueOrNull(string jiraIssueKey)
         {
             using (HttpClient client = JiraCommonAPI.CreateHttpClient())
@@ -61,10 +62,11 @@ namespace JiraClient.JiraAPI
                 Logger.Log(MessageType.Info, $"총 이슈 수 파악 took {swFetchOne.Elapsed} seconds");
 
                 // 전체 이슈 가져오기
+                string fields = "id,key,summary,description,comment,attachment,assignee,reporter,creator,parent,subtasks,status,labels,issuetype,project,resolution,issuelinks,created,updated,duedate";
                 List<Task<HttpResponseMessage>> tasks = new List<Task<HttpResponseMessage>>();
                 for (int startAt = 0; startAt < total; startAt += maxResults)
                 {
-                    string url = $"/rest/api/latest/search?startAt={startAt}&maxResults={maxResults}";
+                    string url = $"/rest/api/2/search?startAt={startAt}&maxResults={maxResults}&fields={fields}";
                     tasks.Add(client.GetAsync(url));
                 }
 

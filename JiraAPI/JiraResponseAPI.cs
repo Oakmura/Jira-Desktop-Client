@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Net.Mail;
 using Newtonsoft.Json;
 
 namespace JiraClient.JiraAPI
@@ -84,6 +85,67 @@ namespace JiraClient.JiraAPI
         [JsonProperty("duedate")]
         public string DueDate { get; set; }
         public string FormattedDueDate => DueDate == null ? null : DateTime.Parse(DueDate).ToString("yyyy-MM-dd HH:mm");
+
+        [JsonProperty("comment")]
+        public CommentContainer Comment { get; set; }
+
+        [JsonProperty("attachment")]
+        public List<Attachment> Attachment { get; set; }
+    }
+
+    public class CommentContainer
+    {
+        [JsonProperty("comments")]
+        public List<Comment> Comments { get; set; }
+
+        [JsonProperty("maxResults")]
+        public int MaxResults { get; set; }
+
+        [JsonProperty("total")]
+        public int Total { get; set; }
+
+        [JsonProperty("startAt")]
+        public int StartAt { get; set; }
+    }
+
+    public class Comment
+    {
+        [JsonProperty("id")]
+        public string ID { get; set; }
+
+        [JsonProperty("author")]
+        public User Author { get; set; }
+
+        [JsonProperty("body")]
+        public string Body { get; set; }
+
+        [JsonProperty("created")]
+        public string Created { get; set; }
+
+        public string FormattedCreated => Created == null ? null : DateTime.Parse(Created).ToString("yyyy-MM-dd HH:mm");
+    }
+
+    public class Attachment
+    {
+        [JsonProperty("id")]
+        public string ID { get; set; }
+
+        [JsonProperty("author")]
+        public User Author { get; set; }
+
+        [JsonProperty("filename")]
+        public string FileName { get; set; }
+
+        [JsonProperty("size")]
+        public int Size { get; set; }
+
+        [JsonProperty("created")]
+        public string Created { get; set; }
+
+        [JsonProperty("content")]
+        public string ContentUrl { get; set; }
+
+        public string FormattedCreated => Created == null ? null : DateTime.Parse(Created).ToString("yyyy-MM-dd HH:mm");
     }
 
     public class Status

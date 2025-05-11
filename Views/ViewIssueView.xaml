@@ -220,6 +220,55 @@
                 </ItemsControl>
             </StackPanel>
 
+            <!--  Attachments  -->
+            <TextBlock
+                Margin="0,10,0,5"
+                Foreground="{StaticResource DisabledFontBrush}"
+                Text="Attachments" />
+            <ItemsControl Foreground="{StaticResource FontBrush}" ItemsSource="{Binding OriginalIssue.Fields.Attachment}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="0,2,0,2" Orientation="Horizontal">
+                            <TextBlock Text="{Binding FileName}" />
+                            <TextBlock Text=" (" />
+                            <TextBlock Text="{Binding Size}" />
+                            <TextBlock Margin="0,0,10,0" Text=" bytes)" />
+                            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text=" by " />
+                            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="{Binding Author.DisplayName}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!--  Comments  -->
+            <TextBlock
+                Margin="0,10,0,5"
+                Foreground="{StaticResource DisabledFontBrush}"
+                Text="Comments" />
+            <ItemsControl Foreground="{StaticResource FontBrush}" ItemsSource="{Binding OriginalIssue.Fields.Comment.Comments}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border
+                            Margin="0,2,0,2"
+                            Padding="5"
+                            BorderBrush="{StaticResource GrayBrush3}"
+                            BorderThickness="1">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Author.DisplayName}" />
+                                <TextBlock
+                                    FontSize="11"
+                                    Foreground="{StaticResource DisabledFontBrush}"
+                                    Text="{Binding FormattedCreated}" />
+                                <TextBlock
+                                    Margin="0,5,0,0"
+                                    Text="{Binding Body}"
+                                    TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
             <!--  Buttons  -->
             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                 <Button
