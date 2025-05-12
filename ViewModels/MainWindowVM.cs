@@ -46,6 +46,13 @@ namespace JiraClient.ViewModels
             }
         }
 
+        private bool mIsLoading;
+        public bool IsLoading
+        {
+            get => mIsLoading;
+            set { mIsLoading = value; OnPropertyChanged(); }
+        }
+
         private ViewIssueVM mViewIssueVM;
         private ViewIssueView mViewIssueView;
         private CreateIssueVM mCreateIssueVM;
@@ -233,6 +240,8 @@ namespace JiraClient.ViewModels
 
         private async Task initialize()
         {
+            IsLoading = true;
+
             mJiraIssuesByID = await JiraReadAPI.ReadAllJiraIssues();
             mJiraIssuesByJQL = await JiraReadAPI.ReadAllJiraIssuesByJQL();
             UniqueProjectKeys = mJiraIssuesByID.Select(pair => pair.Value.Fields.Project.Key).Distinct().ToList();
@@ -293,6 +302,7 @@ namespace JiraClient.ViewModels
             mIssueListVM.Setup(mJiraIssuesByID, mJiraIssuesByJQL);
 
             mbInitialized = true;
+            IsLoading = false;
         }
 
         private async Task RefreshCreate(JiraIssue jiraIssue)

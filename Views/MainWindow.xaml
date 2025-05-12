@@ -2,10 +2,12 @@
     x:Class="JiraClient.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:JiraClient.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:JiraClient"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:tb="http://www.hardcodet.net/taskbar"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:views="clr-namespace:JiraClient.Views"
     xmlns:vm="clr-namespace:JiraClient.ViewModels"
     Title="Jira Desktop Client"
@@ -17,6 +19,10 @@
     Style="{StaticResource WindowStyle}"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </Window.Resources>
 
     <Window.InputBindings>
         <KeyBinding
@@ -139,5 +145,21 @@
             </Grid>
         </Grid>
 
+        <!--  로딩 오버레이  -->
+        <Grid
+            x:Name="LoadingOverlay"
+            Grid.RowSpan="2"
+            Panel.ZIndex="999"
+            Background="#66000000"
+            IsHitTestVisible="{Binding IsLoading}"
+            Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}">
+            <ui:ProgressRing
+                Width="64"
+                Height="64"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Foreground="DodgerBlue"
+                IsActive="{Binding IsLoading}" />
+        </Grid>
     </Grid>
 </Window>
