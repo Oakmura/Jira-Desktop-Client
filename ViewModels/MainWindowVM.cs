@@ -176,8 +176,14 @@ namespace JiraClient.ViewModels
             JiraIssue jiraIssue = await JiraReadAPI.ReadSingleJiraIssueOrNull(jiraIssueKey);
             Debug.Assert(jiraIssue != null, "JiraIssue is null");
 
-            mJiraIssuesByID[jiraIssue.ID] = jiraIssue;
-            _ = RefreshCreate(jiraIssue);
+            JiraIssue originalJiraIssue = mJiraIssuesByID[jiraIssue.ID];
+            originalJiraIssue.Fields.IssueType = jiraIssue.Fields.IssueType;
+            originalJiraIssue.Fields.Summary = jiraIssue.Fields.Summary;
+            originalJiraIssue.Fields.Description = jiraIssue.Fields.Description;
+            originalJiraIssue.Fields.Assignee = jiraIssue.Fields.Assignee;
+            originalJiraIssue.Fields.DueDate = jiraIssue.Fields.DueDate;
+
+            _ = RefreshUpdate(originalJiraIssue);
         }
 
         public void OnIssueDeleted(JiraIssue jiraIssue)
@@ -352,6 +358,13 @@ namespace JiraClient.ViewModels
             Logger.Log(MessageType.Info, $"Refresh Delete took {sw.Elapsed} seconds");
 
             mIssueListVM.OnIssueDeleted(jiraIssue, mJiraIssuesByID, mJiraIssuesByJQL);
+        }
+
+        private async Task RefreshUpdate(JiraIssue jiraIssue)
+        {
+            mJiraIssuesByJQL = await JiraReadAPI.ReadAllJiraIssuesByJQL();
+
+            mIssueListVM.OnNewIssueUpdated(jiraIssue, mJiraIssuesByID, mJiraIssuesByJQL);
         }
     }
 }

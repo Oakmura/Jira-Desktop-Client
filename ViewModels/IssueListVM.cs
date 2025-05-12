@@ -155,6 +155,90 @@ namespace JiraClient.ViewModels
             });
         }
 
+        public void OnNewIssueUpdated(JiraIssue updatedJiraIssue, Dictionary<string, JiraIssue> jiraIssuesByID, Dictionary<string, List<string>> jiraIssuesByJQL)
+        {
+            string updatedID = updatedJiraIssue.ID;
+            string updatedKey = updatedJiraIssue.Key;
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                // SubTask 여부 확인
+                bool isSubtaskOfAnotherIssue = jiraIssuesByID.Values.Any(parent =>
+                    parent.Fields.SubTasks != null &&
+                    parent.Fields.SubTasks.Any(sub => sub.ID == updatedID));
+
+                if (isSubtaskOfAnotherIssue)
+                {
+#if EXTRA_LOG_MODE
+            Logger.Log(MessageType.Info, $"[OnNewIssueUpdated] '{updatedKey}' is a subtask → excluded from all groups");
+#endif
+                    // 기존에 포함되어 있던 그룹에서도 제거
+                    foreach (var group in HierarchicalIssueList)
+                    {
+                        var itemToRemove = group.Children.FirstOrDefault(issue => issue.ID == updatedID);
+                        if (itemToRemove != null)
+                        {
+                            group.Children.Remove(itemToRemove);
+                            Logger.Log(MessageType.Info, $"[OnNewIssueUpdated] '{updatedKey}' removed from group '{group.Name}' (now subtask)");
+                        }
+                    }
+                    return;
+                }
+
+                foreach (var entry in jiraIssuesByJQL)
+                {
+                    string groupName = entry.Key;
+                    List<string> issueIDs = entry.Value;
+
+                    if (issueIDs.Contains(updatedID))
+                    {
+                        var group = HierarchicalIssueList.FirstOrDefault(g => g.Name == groupName);
+                        if (group != null)
+                        {
+                            // 해당 그룹에 이미 존재하는 경우 → 업데이트
+                            var existingIssue = group.Children.FirstOrDefault(issue => issue.ID == updatedID);
+                            if (existingIssue != null)
+                            {
+                                int index = group.Children.IndexOf(existingIssue);
+                                group.Children[index] = updatedJiraIssue;
+                                Logger.Log(MessageType.Info, $"[OnNewIssueUpdated] '{updatedKey}' updated in group '{groupName}'");
+                            }
+                            else
+                            {
+                                // 존재하지 않는다면 새로 추가
+                                group.Children.Add(updatedJiraIssue);
+                                Logger.Log(MessageType.Info, $"[OnNewIssueUpdated] '{updatedKey}' added to group '{groupName}'");
+                            }
+                        }
+                        else
+                        {
+                            // 그룹이 존재하지 않는다면 새로 생성
+                            HierarchicalIssueList.Add(new HierarchicalIssueList
+                            {
+                                Name = groupName,
+                                Children = new ObservableCollection<JiraIssue> { updatedJiraIssue }
+                            });
+                            Logger.Log(MessageType.Info, $"[OnNewIssueUpdated] '{updatedKey}' added to new group '{groupName}'");
+                        }
+                    }
+                    else
+                    {
+                        // 해당 그룹에 포함되어 있었지만 조건이 맞지 않아져서 제거 필요
+                        var group = HierarchicalIssueList.FirstOrDefault(g => g.Name == groupName);
+                        if (group != null)
+                        {
+                            var issueToRemove = group.Children.FirstOrDefault(issue => issue.ID == updatedID);
+                            if (issueToRemove != null)
+                            {
+                                group.Children.Remove(issueToRemove);
+                                Logger.Log(MessageType.Info, $"[OnNewIssueUpdated] '{updatedKey}' removed from group '{groupName}' (no longer matched)");
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
         public void OnFilterDeleted(FilterVM filterToDelete)
         {
             string filterName = filterToDelete.FilterName;
