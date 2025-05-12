@@ -111,9 +111,7 @@ namespace JiraClient.ViewModels
 
             Logger.Log(MessageType.Info, "Refreshing MainWindow ViewModel");
 
-            mIssueListVM.OnRefreshCommand(mJiraIssuesByID, mJiraIssuesByJQL);
-            mCreateIssueVM.OnRefreshCommand();
-            mCreateFilterVM.OnRefreshCommand();
+            _ = initialize();
 
             mLastRefreshTime = DateTime.Now;
         }
