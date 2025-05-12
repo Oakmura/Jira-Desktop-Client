@@ -254,11 +254,10 @@
                             BorderBrush="{StaticResource GrayBrush3}"
                             BorderThickness="1">
                             <StackPanel>
-                                <TextBlock Text="{Binding Author.DisplayName}" />
-                                <TextBlock
-                                    FontSize="11"
-                                    Foreground="{StaticResource DisabledFontBrush}"
-                                    Text="{Binding FormattedCreated}" />
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Margin="0,0,10,0" Text="{Binding Author.DisplayName}" />
+                                    <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="{Binding FormattedCreated}" />
+                                </StackPanel>
                                 <TextBlock
                                     Margin="0,5,0,0"
                                     Text="{Binding Body}"
