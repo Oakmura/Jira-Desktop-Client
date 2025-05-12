@@ -6,6 +6,7 @@ using System.Windows.Input;
 using JiraClient.Common;
 using JiraClient.JiraAPI;
 using JiraClient.Utilities;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace JiraClient.ViewModels
 {
@@ -70,6 +71,13 @@ namespace JiraClient.ViewModels
             set { mSelectedAssignee = value; OnPropertyChanged(); }
         }
 
+        private string mParentIssueKey;
+        public string ParentIssueKey
+        {
+            get => mParentIssueKey;
+            set { mParentIssueKey = value; OnPropertyChanged(); }
+        }
+
         public ObservableCollection<IssueType> IssueTypes { get; } = new();
         public ObservableCollection<User> Assignees { get; } = new();
         public ObservableCollection<Attachment> Attachments { get; } = new();
@@ -94,6 +102,7 @@ namespace JiraClient.ViewModels
             Summary = jiraIssue.Fields.Summary;
             Description = jiraIssue.Fields.Description;
             DueDate = string.IsNullOrWhiteSpace(jiraIssue.Fields.DueDate) ? null : DateTime.Parse(jiraIssue.Fields.DueDate);
+            ParentIssueKey = jiraIssue.Fields.Parent != null ? jiraIssue.Fields.Parent.Key : string.Empty;
 
             Attachments.Clear();
             foreach (var att in jiraIssue.Fields.Attachment ?? Enumerable.Empty<Attachment>())
@@ -237,6 +246,7 @@ namespace JiraClient.ViewModels
                 DueDate = string.IsNullOrWhiteSpace(mOriginalIssue.Fields.DueDate) ? null : DateTime.Parse(mOriginalIssue.Fields.DueDate);
                 SelectedIssueType = IssueTypes.FirstOrDefault(x => x.ID == mOriginalIssue.Fields.IssueType.ID);
                 SelectedAssignee = Assignees.FirstOrDefault(x => x.AccountID == mOriginalIssue.Fields.Assignee?.AccountID);
+                ParentIssueKey = mOriginalIssue.Fields.Parent != null ? mOriginalIssue.Fields.Parent.Key : string.Empty;
             }
         }
 
@@ -255,12 +265,26 @@ namespace JiraClient.ViewModels
                     Description = Description,
                     DueDate = DueDate?.ToString("yyyy-MM-dd"),
                     IssueType = SelectedIssueType != null ? new IssueType { ID = SelectedIssueType.ID } : null,
-                    Assignee = SelectedAssignee != null ? new User { AccountID = SelectedAssignee.AccountID } : null
+                    Assignee = SelectedAssignee != null ? new User { AccountID = SelectedAssignee.AccountID } : null,
+                    JiraIssue = ParentIssueKey != string.Empty ? new JiraIssue { Key = ParentIssueKey } : null
                 }
             };
 
-            bool result = await JiraUpdateAPI.UpdateIssueAsync(mOriginalIssue.Key, update);
-            Logger.Log(result ? MessageType.Info : MessageType.Error, result ? "이슈 업데이트 성공" : "이슈 업데이트 실패");
+            bool bSuccess = await JiraUpdateAPI.UpdateIssueAsync(mOriginalIssue.Key, update);
+            Logger.Log(bSuccess ? MessageType.Info : MessageType.Error, bSuccess ? "이슈 업데이트 성공" : "이슈 업데이트 실패");
+            if (!bSuccess)
+            {
+                return;
+            }
+
+            MainWindowVM mainWindowVM = Application.Current.MainWindow.DataContext as MainWindowVM;
+            if (mainWindowVM == null)
+            {
+                Logger.Log(MessageType.Warning, "MainWindowVM을 찾을 수 없습니다.");
+                return;
+            }
+
+            mainWindowVM.OnIssueUpdated(mOriginalIssue.Key);
         }
 
         private string buildIssuePath(JiraIssue issue)

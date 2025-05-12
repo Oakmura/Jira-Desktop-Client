@@ -173,6 +173,15 @@ namespace JiraClient.ViewModels
             _ = RefreshCreate(jiraIssue);
         }
 
+        public async void OnIssueUpdated(string jiraIssueKey)
+        {
+            JiraIssue jiraIssue = await JiraReadAPI.ReadSingleJiraIssueOrNull(jiraIssueKey);
+            Debug.Assert(jiraIssue != null, "JiraIssue is null");
+
+            mJiraIssuesByID[jiraIssue.ID] = jiraIssue;
+            _ = RefreshCreate(jiraIssue);
+        }
+
         public void OnIssueDeleted(JiraIssue jiraIssue)
         {
             mJiraIssuesByID.Remove(jiraIssue.ID);

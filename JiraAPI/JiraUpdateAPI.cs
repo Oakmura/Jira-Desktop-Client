@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Text;
 using Newtonsoft.Json;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace JiraClient.JiraAPI
 {
@@ -38,6 +39,9 @@ namespace JiraClient.JiraAPI
 
             [JsonProperty("assignee", NullValueHandling = NullValueHandling.Ignore)]
             public User Assignee { get; set; }
+
+            [JsonProperty("parent", NullValueHandling = NullValueHandling.Ignore)]
+            public JiraIssue JiraIssue { get; set; }
         }
 
         public class UpdateJiraIssueUpdate
