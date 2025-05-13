@@ -12,17 +12,28 @@
             Background="{StaticResource GrayBrush2}"
             BorderThickness="0"
             ItemsSource="{Binding HierarchicalIssueList}"
-            MouseDoubleClick="SelectedIssueDoubleClick"
             KeyDown="IssueTreeView_KeyDown"
+            MouseDoubleClick="SelectedIssueDoubleClick"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
             ScrollViewer.VerticalScrollBarVisibility="Auto"
             SelectedItemChanged="SelectedIssueChanged">
 
-            <TreeView.Resources>
+            <TreeView.ItemContainerStyle>
                 <Style TargetType="TreeViewItem">
-                    <Setter Property="Margin" Value="-10,0,0,0" />
+                    <!--  트리 항목 간 간격 제거  -->
+                    <Setter Property="Margin" Value="0" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="FontSize" Value="11" />
+                    <!--  들여쓰기 감소  -->
+                    <Setter Property="ItemsPanel">
+                        <Setter.Value>
+                            <ItemsPanelTemplate>
+                                <StackPanel Margin="0" />
+                            </ItemsPanelTemplate>
+                        </Setter.Value>
+                    </Setter>
                 </Style>
-            </TreeView.Resources>
+            </TreeView.ItemContainerStyle>
 
             <!--  Root node: HierarchicalIssueList  -->
             <TreeView.ItemTemplate>
