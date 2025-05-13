@@ -205,7 +205,7 @@
             <!--  Issue Links  -->
             <StackPanel Margin="0,0,0,5" Orientation="Vertical">
                 <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Issue Links" />
-                <ItemsControl Margin="5,0,0,0" ItemsSource="{Binding OriginalIssue.Fields.IssueLinks}">
+                <ItemsControl ItemsSource="{Binding OriginalIssue.Fields.IssueLinks}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Margin="0,2,0,0" Orientation="Horizontal">
