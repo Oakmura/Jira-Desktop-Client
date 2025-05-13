@@ -14,6 +14,7 @@ namespace JiraClient.ViewModels
     {
         public ICommand UpdateIssueCommand { get; }
         public ICommand ResetIssueCommand { get; }
+        public ICommand AddCommentCommand { get; }
 
         public JiraIssue OriginalIssue => mOriginalIssue;
 
@@ -78,6 +79,13 @@ namespace JiraClient.ViewModels
             set { mParentIssueKey = value; OnPropertyChanged(); }
         }
 
+        private string mNewCommentText;
+        public string NewCommentText
+        {
+            get => mNewCommentText;
+            set { mNewCommentText = value; OnPropertyChanged(); }
+        }
+
         public ObservableCollection<IssueType> IssueTypes { get; } = new();
         public ObservableCollection<User> Assignees { get; } = new();
         public ObservableCollection<Attachment> Attachments { get; } = new();
@@ -90,6 +98,7 @@ namespace JiraClient.ViewModels
         {
             UpdateIssueCommand = new RelayCommand(async () => await OnUpdateIssueCommand());
             ResetIssueCommand = new RelayCommand(OnResetIssueCommand);
+            AddCommentCommand = new RelayCommand(async () => await OnAddCommentCommand());
         }
 
         public async void OnSelectedIssueChanged(JiraIssue jiraIssue)
@@ -285,6 +294,25 @@ namespace JiraClient.ViewModels
             }
 
             mainWindowVM.OnIssueUpdated(mOriginalIssue.Key);
+        }
+
+        private async Task OnAddCommentCommand()
+        {
+            if (mOriginalIssue == null || string.IsNullOrEmpty(NewCommentText))
+            {
+                return;
+            }
+
+            Comment comment = await JiraCreateAPI.AddCommentAsync(mOriginalIssue.Key, NewCommentText);
+            if (comment != null)
+            {
+                Comments.Add(comment);
+                NewCommentText = string.Empty;
+            }
+            else
+            {
+                Logger.Log(MessageType.Error, "코멘트 추가 실패");
+            }
         }
 
         private string buildIssuePath(JiraIssue issue)

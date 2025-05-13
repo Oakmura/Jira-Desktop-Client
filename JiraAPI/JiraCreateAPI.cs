@@ -107,5 +107,39 @@ namespace JiraClient.JiraAPI
                 }
             }
         }
+
+        public static async Task<Comment> AddCommentAsync(string issueKey, string newCommentText)
+        {
+            using (HttpClient client = JiraCommonAPI.CreateHttpClient())
+            {
+                var commentPayload = new
+                {
+                    body = newCommentText
+                };
+
+                string json = JsonConvert.SerializeObject(commentPayload);
+                StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                string url = $"{Settings.JiraBaseURL}/rest/api/2/issue/{issueKey}/comment";
+                HttpResponseMessage response = await client.PostAsync(url, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string responseContent = await response.Content.ReadAsStringAsync();
+                    Comment createdComment = JsonConvert.DeserializeObject<Comment>(responseContent);
+
+                    Logger.Log(MessageType.Info, $"댓글 추가 성공: {createdComment.ID} / 이슈: {issueKey}");
+
+                    return createdComment;
+                }
+                else
+                {
+                    string error = await response.Content.ReadAsStringAsync();
+                    Logger.Log(MessageType.Error, $"댓글 추가 실패: {response.StatusCode}\n{error}");
+
+                    return null;
+                }
+            }
+        }
     }
 }
