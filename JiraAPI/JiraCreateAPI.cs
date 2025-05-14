@@ -1,4 +1,6 @@
-﻿using System.Net.Http;
+﻿using System.IO;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Mail;
 using System.Text;
 using JiraClient.Utilities;
@@ -138,6 +140,42 @@ namespace JiraClient.JiraAPI
                     Logger.Log(MessageType.Error, $"댓글 추가 실패: {response.StatusCode}\n{error}");
 
                     return null;
+                }
+            }
+        }
+
+        public static async Task UploadAttachmentAsync(string issueKey, string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                return;
+            }
+
+            using (HttpClient client = JiraCommonAPI.CreateHttpClient())
+            {
+                client.DefaultRequestHeaders.Add("X-Atlassian-Token", "no-check");
+
+                MultipartFormDataContent content = new MultipartFormDataContent();
+                byte[] fileBytes = File.ReadAllBytes(filePath);
+                ByteArrayContent fileContent = new ByteArrayContent(fileBytes);
+                fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+                {
+                    Name = "\"file\"",
+                    FileName = $"\"{Path.GetFileName(filePath)}\""
+                };
+                content.Add(fileContent);
+
+                string url = $"{Settings.JiraBaseURL}/rest/api/latest/issue/{issueKey}/attachments";
+                HttpResponseMessage response = await client.PostAsync(url, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Logger.Log(MessageType.Info, $"Attachment uploaded: {Path.GetFileName(filePath)}");
+                }
+                else
+                {
+                    string error = await response.Content.ReadAsStringAsync();
+                    Logger.Log(MessageType.Error, $"Attachment upload failed: {response.StatusCode}\n{error}");
                 }
             }
         }

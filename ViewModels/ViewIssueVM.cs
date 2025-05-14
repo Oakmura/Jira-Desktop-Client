@@ -1,12 +1,17 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Net.Http.Headers;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using JiraClient.Common;
 using JiraClient.JiraAPI;
 using JiraClient.Utilities;
+using Newtonsoft.Json;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
+using System.IO;
 
 namespace JiraClient.ViewModels
 {
@@ -141,6 +146,68 @@ namespace JiraClient.ViewModels
         public void SetAssignableUsersByProject(Dictionary<string, List<User>> assignableUsersByProject)
         {
             mAssignableUsersByProject = assignableUsersByProject;
+        }
+
+        public async Task UploadAttachmentAsync(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                return; 
+            }
+
+            using (HttpClient client = JiraCommonAPI.CreateHttpClient())
+            {
+                client.DefaultRequestHeaders.Add("X-Atlassian-Token", "no-check");
+
+                MultipartFormDataContent content = new MultipartFormDataContent();
+                byte[] fileBytes = File.ReadAllBytes(filePath);
+                ByteArrayContent fileContent = new ByteArrayContent(fileBytes);
+                fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+                {
+                    Name = "\"file\"",
+                    FileName = $"\"{Path.GetFileName(filePath)}\""
+                };
+                content.Add(fileContent);
+
+                string url = $"{Settings.JiraBaseURL}/rest/api/latest/issue/{OriginalIssue.Key}/attachments";
+                HttpResponseMessage response = await client.PostAsync(url, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Logger.Log(MessageType.Info, $"Attachment uploaded: {Path.GetFileName(filePath)}");
+                }
+                else
+                {
+                    string error = await response.Content.ReadAsStringAsync();
+                    Logger.Log(MessageType.Error, $"Attachment upload failed: {response.StatusCode}\n{error}");
+                    MessageBox.Show($"Upload failed: {response.StatusCode}");
+                }
+            }
+        }
+
+        public async Task RefreshAttachmentsAsync()
+        {
+            using (HttpClient client = JiraCommonAPI.CreateHttpClient())
+            {
+                string url = $"{Settings.JiraBaseURL}/rest/api/latest/issue/{OriginalIssue.Key}?fields=attachment";
+                HttpResponseMessage response = await client.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string json = await response.Content.ReadAsStringAsync();
+                    JiraIssue updatedIssue = JsonConvert.DeserializeObject<JiraIssue>(json);
+
+                    OriginalIssue.Fields.Attachment = updatedIssue.Fields.Attachment;
+                    OnPropertyChanged(nameof(OriginalIssue));
+
+                    Logger.Log(MessageType.Info, $"Attachment list refreshed: {OriginalIssue.Key}");
+                }
+                else
+                {
+                    string error = await response.Content.ReadAsStringAsync();
+                    Logger.Log(MessageType.Error, $"Attachment refresh failed: {response.StatusCode}\n{error}");
+                }
+            }
         }
 
         private async Task updateIssueTypes()

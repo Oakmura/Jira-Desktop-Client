@@ -5,6 +5,7 @@
     xmlns:converters="clr-namespace:JiraClient.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:viewmodels="clr-namespace:JiraClient.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:ViewIssueVM}"
     d:DesignHeight="600"
@@ -220,25 +221,76 @@
                 </ItemsControl>
             </StackPanel>
 
-            <!--  Attachments  -->
+            <!--  Attachments Header  -->
             <TextBlock
                 Margin="0,10,0,5"
                 Foreground="{StaticResource DisabledFontBrush}"
                 Text="Attachments" />
+
+            <!--  Drop Zone  -->
+            <Border
+                Padding="10"
+                AllowDrop="True"
+                Background="{StaticResource GrayBrush1}"
+                BorderBrush="{StaticResource FontBrush}"
+                BorderThickness="1"
+                DragOver="AttachmentDragOver"
+                Drop="AttachmentDrop">
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Foreground="{StaticResource FontBrush}"
+                    Text="Drag and drop a file here to upload" />
+            </Border>
+
+            <!--  Attachments List  -->
             <ItemsControl Foreground="{StaticResource FontBrush}" ItemsSource="{Binding OriginalIssue.Fields.Attachment}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Margin="0,2,0,2" Orientation="Horizontal">
-                            <TextBlock Text="{Binding FileName}" />
-                            <TextBlock Text=" (" />
-                            <TextBlock Text="{Binding Size}" />
-                            <TextBlock Margin="0,0,10,0" Text=" bytes)" />
-                            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text=" by " />
-                            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="{Binding Author.DisplayName}" />
-                        </StackPanel>
+                        <Grid MinHeight="16" Margin="0,1,0,1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!--  Left side: File info  -->
+                            <StackPanel
+                                Grid.Column="0"
+                                Margin="0,0,5,0"
+                                VerticalAlignment="Center"
+                                Orientation="Horizontal">
+                                <TextBlock VerticalAlignment="Center" Text="{Binding FileName}" />
+                                <TextBlock VerticalAlignment="Center" Text=" (" />
+                                <TextBlock VerticalAlignment="Center" Text="{Binding Size}" />
+                                <TextBlock
+                                    Margin="0,0,5,0"
+                                    VerticalAlignment="Center"
+                                    Text=" bytes)" />
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    Foreground="{StaticResource DisabledFontBrush}"
+                                    Text=" by " />
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    Foreground="{StaticResource DisabledFontBrush}"
+                                    Text="{Binding Author.DisplayName}" />
+                            </StackPanel>
+
+                            <!--  Right side: Download button  -->
+                            <ui:HyperlinkButton
+                                Grid.Column="1"
+                                Padding="2,0"
+                                VerticalAlignment="Center"
+                                Content="Download"
+                                FontSize="12"
+                                Foreground="{StaticResource BlueBrush}"
+                                NavigateUri="{Binding ContentUrl}"
+                                ToolTip="Download attachment" />
+                        </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+
 
             <!--  Comments  -->
             <TextBlock

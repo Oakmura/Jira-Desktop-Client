@@ -221,6 +221,30 @@ namespace JiraClient.JiraAPI
             }
         }
 
+        public static async Task<List<Attachment>> RefreshAttachmentsAsync(string issueKey)
+        {
+            using (HttpClient client = JiraCommonAPI.CreateHttpClient())
+            {
+                string url = $"{Settings.JiraBaseURL}/rest/api/latest/issue/{issueKey}?fields=attachment";
+                HttpResponseMessage response = await client.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string json = await response.Content.ReadAsStringAsync();
+                    JiraIssue updatedIssue = JsonConvert.DeserializeObject<JiraIssue>(json);
+
+                    Logger.Log(MessageType.Info, $"Attachment list refreshed: {issueKey}");
+                    return updatedIssue.Fields.Attachment;
+                }
+                else
+                {
+                    string error = await response.Content.ReadAsStringAsync();
+                    Logger.Log(MessageType.Error, $"Attachment refresh failed: {response.StatusCode}\n{error}");
+                    return null;
+                }
+            }
+        }
+
         // TODO: change to appropriate place
         public class CreateMetaResponse
         {
