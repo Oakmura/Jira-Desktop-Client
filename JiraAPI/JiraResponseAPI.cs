@@ -91,6 +91,9 @@ namespace JiraClient.JiraAPI
 
         [JsonProperty("attachment")]
         public List<Attachment> Attachment { get; set; }
+
+        [JsonProperty("environment")]
+        public string Environment { get; set; }
     }
 
     public class CommentContainer
@@ -229,9 +232,8 @@ namespace JiraClient.JiraAPI
 
         [JsonProperty("outwardIssue")]
         public JiraIssue OutwardIssue { get; set; }
-        public string OutwardDescription => OutwardIssue != null ? $"{Type.Inward} {OutwardIssue.Key}" : "";
+        public string OutwardDescription => OutwardIssue != null ? $"{Type.Inward} {OutwardIssue.Key}" : "";    
     }
-
 
     public class IssueLinkType
     {

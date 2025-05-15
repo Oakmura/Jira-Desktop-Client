@@ -62,7 +62,7 @@ namespace JiraClient.JiraAPI
                 Logger.Log(MessageType.Info, $"총 이슈 수 파악 took {swFetchOne.Elapsed} seconds");
 
                 // 전체 이슈 가져오기
-                string fields = "id,key,summary,description,comment,attachment,assignee,reporter,creator,parent,subtasks,status,labels,issuetype,project,resolution,issuelinks,created,updated,duedate";
+                string fields = "id,key,summary,description,comment,attachment,assignee,reporter,creator,parent,subtasks,status,labels,issuetype,project,resolution,issuelinks,created,updated,duedate, environment";
                 List<Task<HttpResponseMessage>> tasks = new List<Task<HttpResponseMessage>>();
                 for (int startAt = 0; startAt < total; startAt += maxResults)
                 {

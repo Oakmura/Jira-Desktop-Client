@@ -105,6 +105,13 @@
                 TextWrapping="Wrap"
                 VerticalScrollBarVisibility="Auto" />
 
+            <!--  Environment  -->
+            <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Environment" />
+            <TextBlock
+                Margin="0,2,0,10"
+                Style="{StaticResource LightTextBlockStyle}"
+                Text="{Binding OriginalIssue.Fields.Environment}" />
+
             <!--  SubTasks  -->
             <TextBlock Foreground="{StaticResource DisabledFontBrush}" Text="Sub-Tasks" />
             <ItemsControl MinHeight="20" ItemsSource="{Binding OriginalIssue.Fields.SubTasks}">
